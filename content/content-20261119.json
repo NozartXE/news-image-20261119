@@ -8,10 +8,41 @@
       "region": "Asia",
       "tier": "hero",
       "headline": "Trump, Xi and Putin meet in Shenzhen in first-ever trilateral",
-      "dek": "Trump and Putin shook hands in Shenzhen on Wednesday; the three-way talks follow on Thursday, the first meeting of its kind.",
+      "dek": "Xi, Trump and Putin open the first three-way summit talks on Thursday in Shenzhen; a Wednesday handshake set the stage.",
       "scene": "summit",
       "scene_caption": "THREE LEADERS, ONE TABLE IN SHENZHEN",
-      "scene_spec": {"flags": [["CHINA", [178, 34, 34]], ["RUSSIA", [52, 84, 160]], ["USA", [60, 59, 110]]]}
+      "scene_spec": {
+        "flags": [
+          [
+            "CHINA",
+            [
+              178,
+              34,
+              34
+            ]
+          ],
+          [
+            "RUSSIA",
+            [
+              52,
+              84,
+              160
+            ]
+          ],
+          [
+            "USA",
+            [
+              60,
+              59,
+              110
+            ]
+          ]
+        ]
+      },
+      "sources": [
+        "AP"
+      ],
+      "num": 1
     },
     {
       "id": 2,
@@ -19,9 +50,13 @@
       "region": "Europe",
       "tier": "card",
       "headline": "Kerch Bridge hit a third time in a week",
-      "dek": "Traffic is suspended again hours after midnight; a road span fell on Tuesday and repairs could take a year.",
+      "dek": "A span fell Tuesday; traffic halts for a 3rd time in 7 days as crews assess damage. — Reuters",
       "scene": "bridge_fallen",
-      "scene_caption": "KERCH BRIDGE HIT AGAIN"
+      "scene_caption": "KERCH BRIDGE HIT AGAIN",
+      "sources": [
+        "Reuters"
+      ],
+      "num": 2
     },
     {
       "id": 3,
@@ -29,9 +64,13 @@
       "region": "Middle East",
       "tier": "card",
       "headline": "Iran says three tankers hit mines and catch fire",
-      "dek": "Tehran says the vessels sailed a restricted zone with tracking off; the claim is unverified and a fourth tanker was hit by a projectile.",
+      "dek": "Tehran says the vessels entered a restricted zone with tracking off; a 4th tanker was also hit. — AP",
       "scene": "sea_strike",
-      "scene_caption": "THREE TANKERS ON FIRE IN THE GULF"
+      "scene_caption": "THREE TANKERS ON FIRE IN THE GULF",
+      "sources": [
+        "AP"
+      ],
+      "num": 3
     },
     {
       "id": 4,
@@ -39,9 +78,13 @@
       "region": "Middle East",
       "tier": "card",
       "headline": "Bahrain and Kuwait repel Iran drone attacks",
-      "dek": "Iran says its drones targeted U.S. bases at Ali Al-Salem and in Bahrain; no damage or casualties were reported.",
+      "dek": "Interceptors knock the drones down over 2 Gulf states; no damage or casualties reported. — Reuters",
       "scene": "missiles",
-      "scene_caption": "DRONES OVER THE GULF BASES"
+      "scene_caption": "DRONES OVER THE GULF BASES",
+      "sources": [
+        "Reuters"
+      ],
+      "num": 4
     },
     {
       "id": 5,
@@ -49,12 +92,18 @@
       "region": "Africa",
       "tier": "card",
       "headline": "Ebola outbreak still expanding, WHO warns",
-      "dek": "Cases pass 11,500 and deaths top 5,600, with 400 to 500 new cases a week.",
-      "scene": "virus",
+      "dek": "Cases reach 11,536 with deaths topping 5,600; 400 to 500 new cases arrive each week. — WHO",
+      "scene": "clinic_ward",
       "scene_caption": "EBOLA SPREADS IN DR CONGO",
-      "scene_spec": {"label": "DR CONGO"},
+      "scene_spec": {
+        "label": "DR CONGO"
+      },
       "strip_figure": "11,536",
-      "strip_caption": "EBOLA CASES IN DR CONGO"
+      "strip_caption": "EBOLA CASES IN DR CONGO",
+      "sources": [
+        "WHO"
+      ],
+      "num": 5
     },
     {
       "id": 6,
@@ -62,10 +111,18 @@
       "region": "Asia",
       "tier": "card",
       "headline": "Cyclone Akvan turns very severe off India's coast",
-      "dek": "Landfall is forecast for Friday on the Andhra coast, with winds of 120 to 130 kmph and rain over 21 cm.",
+      "dek": "Winds gust to 130 km/h with rain over 21 cm; landfall is due Friday on the Andhra coast. — IMD",
       "scene": "cyclone",
       "scene_caption": "AKVAN HEADS FOR ANDHRA",
-      "scene_spec": {"label": "AKVAN"}
+      "scene_spec": {
+        "label": "AKVAN"
+      },
+      "sources": [
+        "IMD"
+      ],
+      "strip_figure": "130 km/h",
+      "strip_caption": "AKVAN'S PEAK WIND GUSTS",
+      "num": 6
     },
     {
       "id": 7,
@@ -73,20 +130,32 @@
       "region": "Europe",
       "tier": "card",
       "headline": "World Court to rule today on Myanmar genocide case",
-      "dek": "Judges read the judgment at The Hague; Gambia brought the case in 2019 over the 2017 campaign.",
+      "dek": "Gambia brought the case in 2019 over the 2017 Rohingya campaign; judges read the ruling today. — AP",
       "scene": "scales",
-      "scene_caption": "MYANMAR GENOCIDE RULING TODAY"
+      "scene_caption": "MYANMAR GENOCIDE RULING TODAY",
+      "sources": [
+        "AP"
+      ],
+      "num": 7
     },
     {
-      "id": 8,
-      "place": "PASADENA",
-      "region": "North America",
+      "id": 14,
+      "place": "ANTALYA",
+      "region": "Europe",
       "tier": "card",
-      "headline": "Voyager 1 reaches one light-day from Earth",
-      "dek": "NASA's 1977 probe crosses a threshold no spacecraft has crossed; its signal now takes a full day to arrive.",
-      "scene": "probe",
-      "scene_caption": "ONE LIGHT-DAY FROM HOME",
-      "scene_spec": {"label": "VOYAGER 1"}
+      "headline": "COP31 draft splits ministers as talks near the end",
+      "dek": "Ministers split over the draft as OPEC defends fossil fuels; a 35% power target for 2035 is backed. — Reuters",
+      "strip_figure": "35%",
+      "strip_caption": "COP31 2035 POWER TARGET",
+      "scene": "conference",
+      "scene_caption": "COP31 TALKS NEAR THE END",
+      "scene_spec": {
+        "label": "COP31"
+      },
+      "sources": [
+        "Reuters"
+      ],
+      "num": 8
     },
     {
       "id": 9,
@@ -94,12 +163,16 @@
       "region": "North America",
       "tier": "card",
       "headline": "Nvidia posts record quarter; ends China chip sales",
-      "dek": "First results since Huang's exit beat forecasts; Kress halts H200 shipments as U.S. rules tighten.",
+      "dek": "Revenue roughly doubles year on year as Kress halts H200 chip shipments to China. — Bloomberg",
       "scene": "chip",
       "scene_caption": "RECORD QUARTER, CHINA SALES END",
-      "scene_spec": {"label": "NVIDIA"},
-      "strip_figure": "$115.8bn",
-      "strip_caption": "NVIDIA REVENUE, DOUBLE LAST YEAR"
+      "scene_spec": {
+        "label": "NVIDIA"
+      },
+      "sources": [
+        "Bloomberg"
+      ],
+      "num": 9
     },
     {
       "id": 10,
@@ -107,12 +180,16 @@
       "region": "North America",
       "tier": "card",
       "headline": "Dow slides as Fed minutes point to more rate hikes",
-      "dek": "UnitedHealth sinks 10% on a Medicare audit plan; the Dow falls a fifth straight day.",
+      "dek": "UnitedHealth sinks 10% on a Medicare audit plan; the index falls a 5th straight day. — Reuters",
       "scene": "chart_down",
       "scene_caption": "WALL STREET SLIDES ON FED MINUTES",
-      "scene_spec": {"label": "DOW"},
-      "strip_figure": "561",
-      "strip_caption": "POINTS THE DOW LOST AFTER FED MINUTES"
+      "scene_spec": {
+        "label": "DOW"
+      },
+      "sources": [
+        "Reuters"
+      ],
+      "num": 10
     },
     {
       "id": 11,
@@ -120,11 +197,15 @@
       "region": "Middle East",
       "tier": "card",
       "headline": "Gaza's tents fail as winter rain floods the camps",
-      "dek": "Families face a fourth winter in worn-out shelters; aid groups say stocks cover a fraction of the need.",
+      "dek": "Aid groups say 150,000 tents sit blocked at the border as a 4th winter closes in. — AP",
       "scene": "tents",
       "scene_caption": "FOURTH WINTER UNDER CANVAS",
       "strip_figure": "150,000",
-      "strip_caption": "TENTS BLOCKED AT GAZA'S BORDER"
+      "strip_caption": "TENTS BLOCKED AT BORDER",
+      "sources": [
+        "AP"
+      ],
+      "num": 11
     },
     {
       "id": 12,
@@ -132,34 +213,39 @@
       "region": "North America",
       "tier": "card",
       "headline": "U.S. loses measles elimination status after 26 years",
-      "dek": "PAHO ends the status held since 2000 as cases climb to a record; officials urge vaccination.",
+      "dek": "Cases climb to a record 5,412 with 10 deaths as PAHO ends the status held since 2000. — AP",
       "scene": "case_map",
       "scene_caption": "MEASLES STATUS LOST AFTER 26 YEARS",
-      "scene_spec": {"label": "UNITED STATES"},
+      "scene_spec": {
+        "label": "UNITED STATES"
+      },
       "strip_figure": "5,412",
-      "strip_caption": "U.S. MEASLES CASES THIS YEAR, 10 DEATHS"
+      "strip_caption": "U.S. MEASLES CASES IN 2026",
+      "sources": [
+        "AP",
+        "PAHO"
+      ],
+      "num": 12
     },
     {
-      "id": 13,
-      "place": "WASHINGTON",
-      "region": "North America",
+      "id": 18,
+      "place": "NEW ZEALAND",
+      "region": "Oceania",
       "tier": "card",
-      "headline": "Jeffries nominated as first Black House speaker",
-      "dek": "Democrats back him 251 to 11 in a closed-door vote; the full House votes on January 3.",
-      "scene": "ballot",
-      "scene_caption": "FIRST BLACK SPEAKER NOMINEE",
-      "scene_spec": {"label": "U.S. HOUSE"}
-    },
-    {
-      "id": 14,
-      "place": "ANTALYA",
-      "region": "Europe",
-      "tier": "index",
-      "headline": "COP31 draft splits ministers as talks near the end",
-      "dek": "A draft deal splits ministers as OPEC defends fossil fuels; talks close Friday.",
-      "brief": "ANTALYA — COP31: power target backed",
-      "strip_figure": "35%",
-      "strip_caption": "ELECTRICITY SHARE TARGET FOR 2035"
+      "headline": "GTA VI launches to a 99 Metacritic score",
+      "dek": "Rockstar's sequel lands after a 13-year wait to a 99 Metacritic score; queues form at midnight. — IGN",
+      "scene": "gta_skyline",
+      "scene_caption": "GTA VI LAUNCH DAY",
+      "scene_spec": {
+        "label": "GTA VI"
+      },
+      "sources": [
+        "IGN",
+        "Metacritic"
+      ],
+      "strip_figure": "99",
+      "strip_caption": "GTA VI METACRITIC SCORE",
+      "num": 13
     },
     {
       "id": 15,
@@ -168,7 +254,11 @@
       "tier": "index",
       "headline": "Houthis seize Red Sea coast posts as forces pull back",
       "dek": "Government forces pull back to defend Aden; the Saudi-led coalition strikes back.",
-      "brief": "ADEN — Houthis seize Red Sea coast posts"
+      "brief": "ADEN — Houthis seize Red Sea coast posts.",
+      "sources": [
+        "Reuters"
+      ],
+      "num": 14
     },
     {
       "id": 16,
@@ -177,7 +267,11 @@
       "tier": "index",
       "headline": "Estonia to shut its Russia border from December 1",
       "dek": "Tallinn blames the GRU for a foiled drone-factory sabotage; eight suspects are held.",
-      "brief": "TALLINN — Estonia to shut Russia border"
+      "brief": "TALLINN — Estonia shuts its Russia border.",
+      "sources": [
+        "AP"
+      ],
+      "num": 15
     },
     {
       "id": 17,
@@ -186,16 +280,11 @@
       "tier": "index",
       "headline": "EU offers Ukraine a €45bn loan tied to reparations",
       "dek": "Kyiv repays only after Russian reparations; leaders discuss it next week.",
-      "brief": "BRUSSELS — EU offers €45bn Ukraine loan"
-    },
-    {
-      "id": 18,
-      "place": "NEW ZEALAND",
-      "region": "Oceania",
-      "tier": "index",
-      "headline": "GTA VI launches to a 99 Metacritic score",
-      "dek": "Rockstar's game rolls out worldwide after 13 years; critics call it a masterpiece.",
-      "brief": "NEW ZEALAND — GTA VI launches to 99 score"
+      "brief": "BRUSSELS — EU offers a €45bn Ukraine loan.",
+      "sources": [
+        "Reuters"
+      ],
+      "num": 16
     },
     {
       "id": 19,
@@ -204,7 +293,11 @@
       "tier": "index",
       "headline": "Bangladesh flips the switch on its first nuclear unit",
       "dek": "Rooppur's first unit feeds 350 MW to the grid in a trial; full power follows a 10-month test.",
-      "brief": "DHAKA — Bangladesh flips nuclear switch"
+      "brief": "DHAKA — Bangladesh starts its first reactor.",
+      "sources": [
+        "AP"
+      ],
+      "num": 17
     },
     {
       "id": 20,
@@ -213,7 +306,11 @@
       "tier": "index",
       "headline": "Trump plotter jailed for 27 years",
       "dek": "Asif Merchant gets 330 months for the Iran-backed 2024 assassination plot.",
-      "brief": "NEW YORK — Trump plotter jailed 27 years"
+      "brief": "NEW YORK — Trump plotter gets 27 years.",
+      "sources": [
+        "AP"
+      ],
+      "num": 18
     },
     {
       "id": 21,
@@ -222,7 +319,11 @@
       "tier": "index",
       "headline": "Libya seizes four million pills and cocaine in Derna",
       "dek": "Eastern authorities break a drug gang; the UN calls Libya a transit hub.",
-      "brief": "DERNA — Libya seizes 4m pills, cocaine"
+      "brief": "DERNA — Libya seizes 4m pills and cocaine.",
+      "sources": [
+        "Reuters"
+      ],
+      "num": 19
     },
     {
       "id": 22,
@@ -231,7 +332,11 @@
       "tier": "index",
       "headline": "Haiti signs El Salvador security deal",
       "dek": "Cabinet approves the pact as Bukele's troops fight gangs; crowds cheer in the streets.",
-      "brief": "PORT-AU-PRINCE — El Salvador deal signed"
+      "brief": "PORT-AU-PRINCE — Haiti signs security deal.",
+      "sources": [
+        "AP"
+      ],
+      "num": 20
     },
     {
       "id": 23,
@@ -240,7 +345,11 @@
       "tier": "index",
       "headline": "Earthshot winners take £1m each in Mumbai",
       "dek": "William hands five prizes in Mumbai, from Bhutan's forests to ocean protection.",
-      "brief": "MUMBAI — Earthshot winners take £1m each"
+      "brief": "MUMBAI — Earthshot winners take £1m each.",
+      "sources": [
+        "BBC News"
+      ],
+      "num": 21
     },
     {
       "id": 24,
@@ -249,7 +358,12 @@
       "tier": "index",
       "headline": "Pew: Muslims to top Christians by 2035",
       "dek": "Pew projects Islam passes Christianity as the world's largest religion by 2035, on faster birth rates.",
-      "brief": "WASHINGTON — Muslims top Christians 2035"
+      "brief": "WASHINGTON — Pew projects a Muslim lead by 2035.",
+      "sources": [
+        "Pew Research Center",
+        "Reuters"
+      ],
+      "num": 22
     },
     {
       "id": 25,
@@ -258,7 +372,11 @@
       "tier": "index",
       "headline": "Saudi Arabia says danger has passed in the south",
       "dek": "Civil defence lifts alerts in Jazan, Najran and Khamis Mushait after Houthi fire.",
-      "brief": "JAZAN — Saudi says danger passed in south"
+      "brief": "JAZAN — Saudi says the danger has passed.",
+      "sources": [
+        "Reuters"
+      ],
+      "num": 23
     },
     {
       "id": 26,
@@ -267,7 +385,12 @@
       "tier": "index",
       "headline": "Hegseth signs Venezuela defence pact",
       "dek": "The U.S. and Venezuela restore military ties; he then lands in Bogota with a C-130.",
-      "brief": "CARACAS — Hegseth inks Venezuela pact"
+      "brief": "CARACAS — Hegseth signs a Venezuela pact.",
+      "sources": [
+        "AP",
+        "Reuters"
+      ],
+      "num": 24
     },
     {
       "id": 27,
@@ -276,7 +399,12 @@
       "tier": "index",
       "headline": "Anthropic prices its IPO at $83 a share",
       "dek": "The AI firm raises about $81bn; shares start trading Thursday as ANT.",
-      "brief": "NEW YORK — Anthropic prices IPO at $83"
+      "brief": "NEW YORK — Anthropic prices its IPO at $83.",
+      "sources": [
+        "Bloomberg",
+        "Reuters"
+      ],
+      "num": 25
     },
     {
       "id": 28,
@@ -285,7 +413,12 @@
       "tier": "index",
       "headline": "Microsoft offers buyouts to 60,000 staff",
       "dek": "Nadella says AI is reshaping roles; staff have until early December to accept.",
-      "brief": "REDMOND — Microsoft offers 60,000 buyouts"
+      "brief": "REDMOND — Microsoft offers 60,000 buyouts.",
+      "sources": [
+        "Reuters",
+        "Bloomberg"
+      ],
+      "num": 26
     },
     {
       "id": 29,
@@ -294,7 +427,11 @@
       "tier": "index",
       "headline": "Last local militant killed in Kashmir",
       "dek": "Lateef Bhat dies in a mosque standoff in Kulgam; police call him LeT's last local man.",
-      "brief": "SRINAGAR — Last local militant killed"
+      "brief": "SRINAGAR — Last local militant is killed.",
+      "sources": [
+        "AP"
+      ],
+      "num": 27
     },
     {
       "id": 30,
@@ -303,7 +440,11 @@
       "tier": "index",
       "headline": "Quad sets up a business leaders' forum",
       "dek": "The four nations agree a business forum and deeper maritime, cyber and AI cooperation.",
-      "brief": "MANILA — Quad sets up business forum"
+      "brief": "MANILA — Quad launches a business forum.",
+      "sources": [
+        "Reuters"
+      ],
+      "num": 28
     },
     {
       "id": 31,
@@ -312,7 +453,11 @@
       "tier": "index",
       "headline": "U.S. reissues security warnings in Bahrain and Saudi Arabia",
       "dek": "The State Department renews warnings for citizens in Bahrain and Saudi Arabia as the Gulf crisis deepens.",
-      "brief": "BAHRAIN — U.S. reissues security warnings"
+      "brief": "BAHRAIN — U.S. reissues security warnings.",
+      "sources": [
+        "AP"
+      ],
+      "num": 29
     },
     {
       "id": 32,
@@ -321,7 +466,11 @@
       "tier": "index",
       "headline": "Minister warns Mélenchon could win the French presidency",
       "dek": "Darmanin says the hard-left leader could win a 2027 runoff against Le Pen; polls still favour Le Pen.",
-      "brief": "PARIS — Mélenchon could win presidency"
+      "brief": "PARIS — Mélenchon could win the presidency.",
+      "sources": [
+        "Reuters"
+      ],
+      "num": 30
     },
     {
       "id": 33,
@@ -330,7 +479,11 @@
       "tier": "index",
       "headline": "Senators warn AI cyber threats are outpacing defences",
       "dek": "Cantwell and Rounds tell the White House to act; a GAO test got attack plans from four chatbots.",
-      "brief": "WASHINGTON — Senators warn on AI threats"
+      "brief": "WASHINGTON — Senators warn on AI threats.",
+      "sources": [
+        "AP"
+      ],
+      "num": 31
     },
     {
       "id": 34,
@@ -339,7 +492,11 @@
       "tier": "index",
       "headline": "Grand jury indicts man in foiled Hindu temple plot",
       "dek": "Paporakis, 19, faces new terrorism charges over the October 11 plan at the Balaji Temple; his rifle jammed.",
-      "brief": "AURORA — Temple plotter faces charges"
+      "brief": "AURORA — Temple plotter faces new charges.",
+      "sources": [
+        "AP"
+      ],
+      "num": 32
     },
     {
       "id": 35,
@@ -348,7 +505,11 @@
       "tier": "index",
       "headline": "India and Japan hold their fourth 2+2 dialogue",
       "dek": "Singh and Jaishankar meet Koizumi and Motegi in Tokyo to review defence and Indo-Pacific ties.",
-      "brief": "TOKYO — India, Japan hold 2+2 talks"
+      "brief": "TOKYO — India and Japan hold 2+2 talks.",
+      "sources": [
+        "Reuters"
+      ],
+      "num": 33
     },
     {
       "id": 36,
@@ -357,7 +518,11 @@
       "tier": "index",
       "headline": "Colombia rejects joint U.S. plan against drug gangs",
       "dek": "De La Espriella tells Washington he lacks the votes in Congress; Hegseth cuts his Bogota visit short.",
-      "brief": "BOGOTA — Colombia rejects joint U.S. plan"
+      "brief": "BOGOTA — Colombia rejects a joint U.S. plan.",
+      "sources": [
+        "AP"
+      ],
+      "num": 34
     },
     {
       "id": 37,
@@ -366,7 +531,11 @@
       "tier": "index",
       "headline": "France jails three women for joining ISIS in Syria",
       "dek": "A Paris court sentences the women to up to 12 years for joining jihadists in Syria in 2015.",
-      "brief": "PARIS — France jails 3 women over ISIS"
+      "brief": "PARIS — France jails three women over ISIS.",
+      "sources": [
+        "AP"
+      ],
+      "num": 35
     },
     {
       "id": 38,
@@ -375,7 +544,11 @@
       "tier": "index",
       "headline": "Auckland mayor says democracy has had its day",
       "dek": "Wayne Brown lauds China's one-party system after a Guangzhou trip; the U.S. ambassador rebukes him.",
-      "brief": "AUCKLAND — Mayor lauds one-party rule"
+      "brief": "AUCKLAND — Mayor praises one-party rule.",
+      "sources": [
+        "Reuters"
+      ],
+      "num": 36
     },
     {
       "id": 39,
@@ -384,7 +557,11 @@
       "tier": "index",
       "headline": "Fiona the hippo must pass a swallowed hat on her own",
       "dek": "Surgery is not an option; vets use a vibration plate and round-the-clock care after a colonoscopy.",
-      "brief": "CINCINNATI — Fiona hippo must pass hat"
+      "brief": "CINCINNATI — Fiona the hippo must pass a hat.",
+      "sources": [
+        "AP"
+      ],
+      "num": 37
     },
     {
       "id": 40,
@@ -393,7 +570,11 @@
       "tier": "index",
       "headline": "Carney pitches Canada as Asia-Pacific energy power",
       "dek": "Canada extends tariff relief with China and pledges to quadruple LNG exports to Asia by 2030.",
-      "brief": "SHENZHEN — Carney pitches Canada to Asia"
+      "brief": "SHENZHEN — Carney pitches Canada to Asia.",
+      "sources": [
+        "Reuters"
+      ],
+      "num": 38
     },
     {
       "id": 41,
@@ -402,7 +583,11 @@
       "tier": "index",
       "headline": "Ukraine says it hit two Russian refineries",
       "dek": "Kyiv says tanks burned at Ilsky and a unit was hit at Afipsky; Zelenskyy hails home-made weapons.",
-      "brief": "KRASNODAR — Ukraine hits 2 refineries"
+      "brief": "KRASNODAR — Ukraine hits two refineries.",
+      "sources": [
+        "Reuters"
+      ],
+      "num": 39
     },
     {
       "id": 42,
@@ -411,7 +596,11 @@
       "tier": "index",
       "headline": "Alcaraz reaches the ATP Finals last four",
       "dek": "Alcaraz beats Medvedev 6-2, 6-4 in Turin; Tiafoe's first Finals win knocks out Cobolli.",
-      "brief": "TURIN — Alcaraz reaches ATP Finals semis"
+      "brief": "TURIN — Alcaraz reaches the ATP semifinals.",
+      "sources": [
+        "AP"
+      ],
+      "num": 40
     },
     {
       "id": 43,
@@ -420,7 +609,37 @@
       "tier": "index",
       "headline": "Thailand rushes clean water to arsenic-hit villages",
       "dek": "Tap water to 14 villages is cut after arsenic hits 30 times the safe limit; 20,000 households affected.",
-      "brief": "CHIANG RAI — Arsenic 30x limit, trucks in"
+      "brief": "CHIANG RAI — Arsenic hits 30x safe limit.",
+      "sources": [
+        "AP"
+      ],
+      "num": 41
+    },
+    {
+      "id": 8,
+      "place": "PASADENA",
+      "region": "North America",
+      "tier": "index",
+      "headline": "Voyager 1 reaches one light-day from Earth",
+      "dek": "NASA's 1977 probe crosses a threshold no spacecraft has crossed; its signal now takes a full day to arrive.",
+      "brief": "PASADENA — Voyager 1 reaches one light-day.",
+      "sources": [
+        "NASA"
+      ],
+      "num": 42
+    },
+    {
+      "id": 44,
+      "place": "TURIN",
+      "region": "Europe",
+      "tier": "index",
+      "headline": "Tiafoe scores his first ATP Finals win",
+      "dek": "Tiafoe's first Finals win knocks out Cobolli in Turin.",
+      "brief": "TURIN — Tiafoe wins his first Finals match.",
+      "sources": [
+        "AP"
+      ],
+      "num": 43
     }
   ]
 }

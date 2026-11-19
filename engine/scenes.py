@@ -122,18 +122,22 @@ def paint_sea_strike(draw, x, y, w, h, spec):
     draw.pieslice([x + int(w * 0.30) - sun_r, sea_y - sun_r,
                    x + int(w * 0.30) + sun_r, sea_y + sun_r], 180, 360,
                   fill=(250, 205, 110))
-    # Island headland.
-    draw.polygon([(x + int(w * 0.66), sea_y), (x + int(w * 0.80), y + int(h * 0.30)),
-                  (x + int(w * 0.93), y + int(h * 0.34)), (x + w, sea_y)], fill=(38, 40, 38))
-    # Three tankers: far-left, main centre, one near the island.
-    tanker(draw, x + int(w * 0.03), sea_y + int(h * 0.10), int(w * 0.16))
-    flame(draw, x + int(w * 0.09), sea_y + int(h * 0.06), 4)
-    tanker(draw, x + int(w * 0.30), sea_y + int(h * 0.16), int(w * 0.30))
-    flame(draw, x + int(w * 0.44), sea_y + int(h * 0.10), 6)
-    smoke(draw, x + int(w * 0.44), sea_y + int(h * 0.04), 5)
-    star_burst(draw, x + int(w * 0.80), y + int(h * 0.30), max(7, h // 8),
+    # Island headland, kept high and behind the third hull.
+    draw.polygon([(x + int(w * 0.70), sea_y), (x + int(w * 0.82), y + int(h * 0.28)),
+                  (x + int(w * 0.94), y + int(h * 0.32)), (x + w, sea_y)], fill=(38, 40, 38))
+    # Three tankers, each hull fully separated by open water and each
+    # carrying its own flame plume, so all three stay countable.
+    tanker(draw, x + int(w * 0.03), sea_y + int(h * 0.08), int(w * 0.16))
+    flame(draw, x + int(w * 0.09), sea_y + int(h * 0.04), 4)
+    smoke(draw, x + int(w * 0.10), sea_y + int(h * 0.01), 3)
+    tanker(draw, x + int(w * 0.30), sea_y + int(h * 0.14), int(w * 0.28))
+    flame(draw, x + int(w * 0.44), sea_y + int(h * 0.08), 6)
+    smoke(draw, x + int(w * 0.44), sea_y + int(h * 0.02), 5)
+    star_burst(draw, x + int(w * 0.80), y + int(h * 0.24), max(7, h // 8),
                (255, 150, 40), seed=11)
-    tanker(draw, x + int(w * 0.68), sea_y + int(h * 0.20), int(w * 0.18))
+    tanker(draw, x + int(w * 0.68), sea_y + int(h * 0.24), int(w * 0.20))
+    flame(draw, x + int(w * 0.78), sea_y + int(h * 0.18), 5)
+    smoke(draw, x + int(w * 0.79), sea_y + int(h * 0.12), 4)
     # Shore missile launcher, bottom-left foreground.
     lx, ly = x + int(w * 0.05), y + h - 6
     draw.rectangle([lx, ly - 6, lx + 20, ly], fill=(24, 26, 24))
@@ -170,23 +174,43 @@ def paint_bridge_fallen(draw, x, y, w, h, spec):
                  0, 180, fill=(210, 226, 234), width=2)
 
 
-def paint_virus(draw, x, y, w, h, spec):
-    draw.rectangle([x, y, x + w, y + h], fill=(24, 26, 34))
-    rng = Lcg(41)
-    for cx_f, cy_f, r_f in ((0.30, 0.52, 0.30), (0.68, 0.42, 0.22), (0.84, 0.68, 0.15)):
-        cx, cy = x + int(w * cx_f), y + int(h * cy_f)
-        r = int(h * r_f)
-        for i in range(14):
-            ang = 2 * math.pi * i / 14
-            sx, sy = cx + int((r + 5) * math.cos(ang)), cy + int((r + 5) * math.sin(ang))
-            draw.line([cx, cy, sx, sy], fill=(196, 62, 48), width=3)
-            draw.ellipse([sx - 3, sy - 3, sx + 3, sy + 3], fill=(222, 84, 62))
-        draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(178, 48, 40))
-        for _ in range(5):
-            dx, dy = rng.below(2 * r) - r, rng.below(2 * r) - r
-            if dx * dx + dy * dy < (r - 4) ** 2:
-                draw.ellipse([cx + dx - 2, cy + dy - 2, cx + dx + 2, cy + dy + 2],
-                             fill=(232, 120, 90))
+def paint_clinic_ward(draw, x, y, w, h, spec):
+    # Ebola treatment ward: pale wall, floor, a red-cross sign, two
+    # responders in protective suits and three occupied beds.
+    draw.rectangle([x, y, x + w, y + h], fill=(226, 222, 206))
+    floor_y = y + int(h * 0.74)
+    draw.rectangle([x, floor_y, x + w, y + h], fill=(176, 168, 148))
+    # Red-cross sign on the back wall.
+    sx, sy = x + int(w * 0.47), y + int(h * 0.08)
+    draw.rectangle([sx, sy, sx + 22, sy + 22], fill=(246, 244, 238), outline=INK)
+    draw.rectangle([sx + 9, sy + 4, sx + 13, sy + 18], fill=(178, 44, 40))
+    draw.rectangle([sx + 4, sy + 9, sx + 18, sy + 13], fill=(178, 44, 40))
+    # Three beds: frame, pillow, a patient's head and a blanket body.
+    blanket = [(150, 96, 84), (96, 116, 140), (140, 128, 92)]
+    for i, fx in enumerate((0.05, 0.35, 0.65)):
+        bx = x + int(w * fx)
+        bw = int(w * 0.25)
+        by = y + int(h * 0.60)
+        draw.rectangle([bx, by, bx + bw, by + 5], fill=(120, 118, 112))
+        draw.line([bx + 3, by + 5, bx + 3, floor_y + 6], fill=(90, 88, 84), width=2)
+        draw.line([bx + bw - 3, by + 5, bx + bw - 3, floor_y + 6],
+                  fill=(90, 88, 84), width=2)
+        draw.rectangle([bx + 2, by - 6, bx + 13, by], fill=(244, 242, 236))
+        draw.ellipse([bx + 4, by - 13, bx + 12, by - 5], fill=(198, 150, 110))
+        draw.rectangle([bx + 13, by - 5, bx + bw - 2, by], fill=blanket[i])
+    # Two responders in pale protective suits, one at each end.
+    for fx, suit in ((0.325, (238, 240, 242)), (0.94, (214, 228, 230))):
+        cx = x + int(w * fx)
+        top = y + int(h * 0.30)
+        draw.ellipse([cx - 8, top, cx + 8, top + 16], fill=suit, outline=(120, 124, 126))
+        draw.rectangle([cx - 6, top + 6, cx + 6, top + 11], fill=(96, 130, 150))
+        draw.rectangle([cx - 10, top + 16, cx + 10, floor_y + 4], fill=suit)
+        draw.line([cx - 10, top + 26, cx + 10, top + 26], fill=(190, 196, 198), width=2)
+    # An IV stand beside the middle bed.
+    ix = x + int(w * 0.625)
+    draw.line([ix, y + int(h * 0.34), ix, floor_y + 2], fill=(100, 100, 100), width=2)
+    draw.rectangle([ix - 4, y + int(h * 0.26), ix + 4, y + int(h * 0.36)],
+                   fill=(196, 220, 228), outline=(100, 110, 116))
     label_chip(draw, x, y, w, h, spec.get("label", ""), align="br")
 
 
@@ -252,25 +276,27 @@ def paint_summit(draw, x, y, w, h, spec):
         label_chip(draw, cx - fw // 2, y + int(h * 0.07) + fh + 1, fw, 14,
                    fname, size=9, align="tl")
     table_y = y + int(h * 0.70)
-    head_top = y + int(h * 0.44)
+    head_top = y + int(h * 0.40)
     for i, cx in enumerate(xs):
-        person(draw, cx, head_top, 1.15, skin, hair[i], suits[i])
+        person(draw, cx, head_top, 1.35, skin, hair[i], suits[i])
         # Microphone angled in from the table.
-        draw.line([cx + 16, table_y, cx + 6, head_top + 26], fill=(16, 16, 18), width=2)
-        draw.ellipse([cx + 3, head_top + 21, cx + 9, head_top + 27], fill=(16, 16, 18))
-    # Putin-Trump handshake ABOVE the table edge, against the wall.
-    # Drawn large on purpose: a small clasp shrinks to a beige blob at
-    # contact scale, so cuffs, sleeves and the clasp itself are chunky.
+        draw.line([cx + 18, table_y, cx + 7, head_top + 30], fill=(16, 16, 18), width=2)
+        draw.ellipse([cx + 4, head_top + 25, cx + 10, head_top + 31], fill=(16, 16, 18))
+    # Putin-Trump handshake ABOVE the table edge, against the wall,
+    # centred between the two leaders and drawn extra large: the clasp
+    # is the hero's central claim and must survive thumbnail scale, so
+    # cuffs, sleeves and the clasp itself are chunky.
     hx = (xs[1] + xs[2]) // 2
-    hy = table_y - int(h * 0.16)
-    draw.line([xs[1] + 14, table_y - 4, hx - 13, hy + 2], fill=suits[1], width=8)
-    draw.line([xs[2] - 14, table_y - 4, hx + 13, hy + 2], fill=suits[2], width=8)
-    draw.rectangle([hx - 34, hy - 5, hx - 12, hy + 6], fill=(240, 238, 230))
-    draw.rectangle([hx + 12, hy - 5, hx + 34, hy + 6], fill=(240, 238, 230))
-    draw.ellipse([hx - 14, hy - 9, hx + 14, hy + 10], fill=skin,
+    hy = table_y - int(h * 0.20)
+    draw.line([xs[1] + 16, table_y - 4, hx - 18, hy + 3], fill=suits[1], width=10)
+    draw.line([xs[2] - 16, table_y - 4, hx + 18, hy + 3], fill=suits[2], width=10)
+    draw.rectangle([hx - 48, hy - 7, hx - 17, hy + 8], fill=(240, 238, 230))
+    draw.rectangle([hx + 17, hy - 7, hx + 48, hy + 8], fill=(240, 238, 230))
+    draw.ellipse([hx - 20, hy - 13, hx + 20, hy + 15], fill=skin,
                  outline=(150, 110, 78), width=2)
-    draw.line([hx - 8, hy - 7, hx + 9, hy + 7], fill=(198, 158, 118), width=3)
-    draw.line([hx + 8, hy - 7, hx - 9, hy + 7], fill=(214, 172, 130), width=2)
+    draw.line([hx - 12, hy - 10, hx + 13, hy + 10], fill=(198, 158, 118), width=4)
+    draw.line([hx + 12, hy - 10, hx - 13, hy + 10], fill=(214, 172, 130), width=3)
+    draw.line([hx - 3, hy - 12, hx - 3, hy + 12], fill=(198, 158, 118), width=2)
     # The long table and its name plates.
     draw.rectangle([x + int(w * 0.04), table_y, x + int(w * 0.96), y + h], fill=(96, 66, 40))
     draw.rectangle([x + int(w * 0.04), table_y, x + int(w * 0.96), table_y + 4],
@@ -378,42 +404,56 @@ def paint_chip(draw, x, y, w, h, spec):
 
 
 def paint_missiles(draw, x, y, w, h, spec):
-    # Night sky, near-vertical staggered launch trails, launchers below.
+    # Night sky over a skyline: incoming drone trails are BROKEN by
+    # interception bursts high above the rooftops - nothing reaches
+    # the city, matching the "repel" headline.
     draw.rectangle([x, y, x + w, y + h], fill=(26, 30, 48))
     rng = Lcg(17)
     for _ in range(16):
         sx = x + 3 + rng.below(w - 6)
         sy = y + 3 + rng.below(int(h * 0.5))
         draw.rectangle([sx, sy, sx + 1, sy + 1], fill=(200, 205, 220))
-    ground_y = y + int(h * 0.86)
-    draw.rectangle([x, ground_y, x + w, y + h], fill=(18, 20, 26))
-    launches = [(0.24, 0.10, False), (0.50, 0.04, True), (0.76, 0.16, False)]
-    for fx, top_f, smoky in launches:
-        gx = x + int(w * fx)
-        top = y + int(h * top_f)
-        # Rising curve: points along a slight quadratic lean.
-        pts = []
-        for t in range(21):
-            f = t / 20.0
-            px = gx + int(10 * f * f)
-            py = ground_y - int((ground_y - top) * f)
-            pts.append((px, py))
-        draw.line(pts, fill=(250, 190, 90), width=2)
-        hx, hy = pts[-1]
-        draw.ellipse([hx - 3, hy - 3, hx + 3, hy + 3], fill=(255, 230, 160))
-        star_burst(draw, hx, hy, 6, (255, 170, 70), seed=int(fx * 100))
-        if smoky:
-            for i in range(6):
-                f = i / 6.0
-                px = gx + int(10 * f * f) - 4
-                py = ground_y - int((ground_y - top) * f)
-                r = 3 + i
-                draw.ellipse([px - r, py - r, px + r, py + r], fill=(150, 148, 152))
-        # Launcher vehicle on the ground line.
-        draw.rectangle([gx - 11, ground_y - 6, gx + 11, ground_y], fill=(70, 74, 66))
-        draw.rectangle([gx + 2, ground_y - 13, gx + 9, ground_y - 6], fill=(52, 56, 50))
-        draw.ellipse([gx - 8, ground_y - 2, gx - 3, ground_y + 3], fill=(10, 10, 12))
-        draw.ellipse([gx + 4, ground_y - 2, gx + 9, ground_y + 3], fill=(10, 10, 12))
+    # City skyline along the bottom, windows lit, rooftops intact.
+    ground_y = y + h
+    rng2 = Lcg(29)
+    bx = x + 2
+    while bx < x + w - 14:
+        bw = 14 + rng2.below(12)
+        bh = int(h * (0.16 + 0.10 * (rng2.below(10) / 10.0)))
+        draw.rectangle([bx, ground_y - bh, bx + bw, ground_y], fill=(16, 18, 26))
+        for _ in range(3):
+            wx = bx + 2 + rng2.below(max(2, bw - 5))
+            wy = ground_y - bh + 3 + rng2.below(max(2, bh - 6))
+            draw.rectangle([wx, wy, wx + 2, wy + 2], fill=(240, 200, 110))
+        bx += bw + 3
+    sky_y = y + int(h * 0.52)  # nothing hostile crosses this line
+    # Three incoming trails from the top corners, each ending mid-sky
+    # in an interception burst, with short debris segments falling
+    # away below the burst - and stopping there.
+    incomings = [(0.06, 0.30, 0.34), (0.42, 0.62, 0.26), (0.94, 0.72, 0.40)]
+    for fx0, fx1, fy1 in incomings:
+        x0, y0 = x + int(w * fx0), y + 2
+        x1, y1 = x + int(w * fx1), y + int(h * fy1)
+        steps = 14
+        for t in range(steps):  # broken trail: draw only even segments
+            if t % 2 == 1:
+                continue
+            f0, f1 = t / steps, (t + 1) / steps
+            draw.line([x0 + (x1 - x0) * f0, y0 + (y1 - y0) * f0,
+                       x0 + (x1 - x0) * f1, y0 + (y1 - y0) * f1],
+                      fill=(250, 170, 90), width=2)
+        # A rising interceptor streak from the skyline to the same point.
+        ix0 = x1 - int(w * 0.10)
+        draw.line([ix0, sky_y + int(h * 0.18), x1, y1], fill=(170, 220, 250), width=2)
+        # The interception burst itself, well above the rooftops.
+        star_burst(draw, x1, y1, max(8, h // 9), (255, 190, 80),
+                   seed=int(fx1 * 100) + 5)
+        draw.ellipse([x1 - 3, y1 - 3, x1 + 3, y1 + 3], fill=(255, 240, 200))
+        # Debris: two short segments tumbling below the burst, fading
+        # out long before the skyline.
+        for dx, dy, ln in ((-8, 10, 5), (6, 14, 4)):
+            draw.line([x1 + dx, y1 + dy, x1 + dx + ln, y1 + dy + 3],
+                      fill=(200, 150, 110), width=2)
 
 
 def paint_probe(draw, x, y, w, h, spec):
@@ -519,10 +559,161 @@ def paint_tents(draw, x, y, w, h, spec):
         draw.ellipse([px, ground_y + 5, px + 30, ground_y + 11], fill=(140, 165, 180))
 
 
+def paint_conference(draw, x, y, w, h, spec):
+    # Climate-conference chamber: panelled wall, a backdrop banner,
+    # five delegates seated at one long table with small flags.
+    draw.rectangle([x, y, x + w, y + h], fill=(208, 202, 188))
+    draw.rectangle([x + int(w * 0.30), y + int(h * 0.08), x + int(w * 0.70),
+                    y + int(h * 0.34)], fill=(70, 96, 84))
+    fnt = ImageFont.truetype(SANS_BOLD, 11)
+    draw.text((x + w // 2 - width_of("COP31", fnt) // 2, y + int(h * 0.16)),
+              "COP31", font=fnt, fill=(240, 238, 228))
+    table_y = y + int(h * 0.68)
+    skin = (232, 192, 158)
+    suits = [(52, 58, 74), (84, 60, 52), (44, 66, 58), (66, 52, 76), (58, 62, 50)]
+    hair = [(30, 28, 26), (120, 90, 60), (18, 18, 18), (200, 200, 200), (60, 44, 30)]
+    for i, fx in enumerate((0.14, 0.32, 0.50, 0.68, 0.86)):
+        cx = x + int(w * fx)
+        person(draw, cx, y + int(h * 0.36), 1.05, skin, hair[i], suits[i],
+               tie=(240, 238, 230))
+        # A small table flag in front of each delegate.
+        draw.line([cx + 10, table_y, cx + 10, table_y - 12], fill=(60, 58, 54), width=1)
+        draw.rectangle([cx + 10, table_y - 12, cx + 18, table_y - 7],
+                       fill=(168, 60, 50) if i % 2 == 0 else (60, 90, 150))
+    draw.rectangle([x + int(w * 0.03), table_y, x + int(w * 0.97), y + h - 3],
+                   fill=(110, 84, 56))
+    draw.rectangle([x + int(w * 0.03), table_y, x + int(w * 0.97), table_y + 4],
+                   fill=(146, 112, 72))
+    label_chip(draw, x, y, w, h, spec.get("label", ""), align="tl")
+
+
+def paint_gta_skyline(draw, x, y, w, h, spec):
+    # Muted dusk over a coastal game city: dusty purple-to-apricot sky,
+    # a low sun, dark skyline silhouettes, palms, lit windows, water.
+    # Saturation deliberately kept low - dusk, never neon.
+    draw.rectangle([x, y, x + w, y + int(h * 0.30)], fill=(94, 82, 108))
+    draw.rectangle([x, y + int(h * 0.30), x + w, y + int(h * 0.55)], fill=(146, 104, 102))
+    draw.rectangle([x, y + int(h * 0.55), x + w, y + int(h * 0.78)], fill=(198, 132, 84))
+    sea_y = y + int(h * 0.78)
+    draw.rectangle([x, sea_y, x + w, y + h], fill=(56, 58, 88))
+    sun_r = max(7, h // 7)
+    sun_cx, sun_cy = x + int(w * 0.34), sea_y - 2
+    draw.ellipse([sun_cx - sun_r, sun_cy - sun_r, sun_cx + sun_r, sun_cy + sun_r],
+                 fill=(236, 186, 116))
+    draw.rectangle([x, sea_y - 2, x + w, sea_y], fill=(120, 84, 84))
+    # Skyline: two dark rows of towers with sparse amber windows.
+    rng = Lcg(97)
+    for base_f, tone, hmin, hmax in ((0.78, (70, 62, 84), 0.18, 0.38),
+                                     (0.80, (40, 38, 52), 0.28, 0.58)):
+        bx = x + 1
+        base = y + int(h * base_f)
+        while bx < x + w - 10:
+            bw = 9 + rng.below(10)
+            bh = int(h * (hmin + (hmax - hmin) * (rng.below(10) / 10.0)))
+            draw.rectangle([bx, base - bh, bx + bw, base], fill=tone)
+            for _ in range(3):
+                if rng.below(10) < 5:
+                    wx = bx + 2 + rng.below(max(2, bw - 4))
+                    wy = base - bh + 3 + rng.below(max(2, bh - 6))
+                    draw.rectangle([wx, wy, wx + 2, wy + 2], fill=(238, 198, 120))
+            bx += bw + 2 + rng.below(4)
+    # Palm silhouettes in the foreground.
+    for fx in (0.08, 0.90):
+        px, py = x + int(w * fx), y + h
+        draw.line([px, py, px + 3, py - int(h * 0.34)], fill=(24, 24, 30), width=3)
+        for ang in (160, 200, 250, 300, 345):
+            ex = px + 3 + int(13 * math.cos(math.radians(ang)))
+            ey = py - int(h * 0.34) + int(8 * math.sin(math.radians(ang)))
+            draw.line([px + 3, py - int(h * 0.34), ex, ey], fill=(24, 24, 30), width=2)
+    # Sun glitter on the water.
+    for i in range(5):
+        gy = sea_y + 3 + i * 3
+        gw = 16 - 2 * i
+        draw.line([sun_cx - gw // 2, gy, sun_cx + gw // 2, gy],
+                  fill=(214, 160, 96), width=1)
+    label_chip(draw, x, y, w, h, spec.get("label", ""), align="tl")
+
+
+# Dotted world map: rows of land cells over a 52x20 grid (stylised -
+# continents readable, coastlines approximate).
+MAP_ROWS = [
+    "                                                    ",
+    "     ##### ##           ##################          ",
+    "    ###########        #####################        ",
+    "   #############       #######################      ",
+    "    ##########          #####################       ",
+    "     ########            ######## ##########        ",
+    "      ######              ######   ########         ",
+    "       ####               #######   ######          ",
+    "       ###                ########   ####           ",
+    "      ####                ########  ######          ",
+    "     ######               #######  #########        ",
+    "     ######                #####   #########        ",
+    "      ####                  ###     ########        ",
+    "      ###                   ##       ######         ",
+    "       ##                                            ",
+    "       #                                             ",
+    "                                                    ",
+    "                                                    ",
+    "                                                    ",
+    "                                                    ",
+]
+
+# Region -> (fx, fy) anchor on the map, aligned to MAP_ROWS landmass.
+REGION_ANCHORS = {
+    "North America": (0.17, 0.24),
+    "South America": (0.14, 0.60),
+    "Europe": (0.50, 0.16),
+    "Africa": (0.56, 0.50),
+    "Middle East": (0.615, 0.30),
+    "Asia": (0.76, 0.20),
+    "Oceania": (0.85, 0.60),
+}
+
+
+def _map_jitter(k):
+    """Deterministic small offset for the k-th item in one region."""
+    return ((k % 3) - 1) * 0.045, (((k // 3) % 3) - 1) * 0.075
+
+
+def paint_worldmap(draw, x, y, w, h, spec):
+    """Dotted landmass with numbered pins (illustrated stories) and
+    plain dots (briefs), placed by each story's region. spec carries
+    'pins': [(num, region)] and 'dots': [region]."""
+    cols = len(MAP_ROWS[0])
+    rows = len(MAP_ROWS)
+    for r, row in enumerate(MAP_ROWS):
+        for c, cell in enumerate(row):
+            if cell == "#":
+                cx = x + int((c + 0.5) * w / cols)
+                cy = y + int((r + 0.5) * h / rows)
+                draw.ellipse([cx - 1, cy - 1, cx + 1, cy + 1], fill=(168, 162, 148))
+    seen_pins, seen_dots = {}, {}
+
+    def _place(region, seen, phase=0):
+        k = seen.get(region, 0)
+        seen[region] = k + 1
+        ax, ay = REGION_ANCHORS[region]
+        jx, jy = _map_jitter(k + phase)
+        return x + int((ax + jx) * w), y + int((ay + jy) * h)
+
+    for region in spec.get("dots") or []:
+        cx, cy = _place(region, seen_dots, phase=1)
+        draw.ellipse([cx - 2, cy - 2, cx + 2, cy + 2], fill=(96, 92, 86))
+    fnt = ImageFont.truetype(SANS_BOLD, 7)
+    for num, region in spec.get("pins") or []:
+        cx, cy = _place(region, seen_pins)
+        draw.ellipse([cx - 6, cy - 6, cx + 6, cy + 6], fill=(168, 38, 32),
+                     outline=(247, 243, 234))
+        label = str(num)
+        draw.text((cx - width_of(label, fnt) // 2, cy - 4), label,
+                  font=fnt, fill=(247, 243, 234))
+
+
 PAINTERS = {
     "sea_strike": paint_sea_strike,
     "bridge_fallen": paint_bridge_fallen,
-    "virus": paint_virus,
+    "clinic_ward": paint_clinic_ward,
     "cyclone": paint_cyclone,
     "summit": paint_summit,
     "case_map": paint_case_map,
@@ -533,4 +724,7 @@ PAINTERS = {
     "ballot": paint_ballot,
     "scales": paint_scales,
     "tents": paint_tents,
+    "conference": paint_conference,
+    "gta_skyline": paint_gta_skyline,
+    "worldmap": paint_worldmap,
 }
