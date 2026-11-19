@@ -1,1 +1,1 @@
-"""Deterministic one-image news front-page engine (news-image-20261119)."""
+"""Render engine for the C1 mosaic front page (original re-authoring)."""

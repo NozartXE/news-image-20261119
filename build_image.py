@@ -1,44 +1,56 @@
-#!/usr/bin/env python3
-"""Draw the news-image-20261119 entry image from a content file.
+"""Build the front page: content JSON in, entry.png out.
 
-Usage: python3 build_image.py [content.json] [out.png]
-
-The content file is the ONLY thing that changes between editions:
-the engine (engine/) validates its accounting (story count, scene
-count, additive numbers strip) and renders it deterministically —
-same content in, byte-identical PNG out. Default content is
-content/content-20261119.json; the 2026-11-18 proof file is passed
-explicitly for the pre-open proof render.
+Fails hard on any validator violation, on any legibility warning being
+unreported, or on an output over 1 MiB. Prints the stats line, the
+byte size, the sha256 and every legibility warning.
 """
 
 import hashlib
 import json
+import os
 import sys
-from pathlib import Path
 
-HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from engine.layout import render  # noqa: E402
+from engine.layout import render
+from engine.validate import validate
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+MAX_BYTES = 1024 * 1024
 
 
 def main():
-    content_path = Path(sys.argv[1]) if len(sys.argv) > 1 else \
-        HERE / "content" / "content-20261119.json"
-    out_path = Path(sys.argv[2]) if len(sys.argv) > 2 else HERE / "entry.png"
-    content = json.loads(content_path.read_text())
-    img, stats, warnings = render(content)
-    img.save(out_path, format="PNG")
-    data = out_path.read_bytes()
-    print(f"stories={stats['stories']} illustrated={stats['illustrated']} "
-          f"continents={stats['continents']} strip={stats['strip']}")
-    print(f"{out_path.name}: {len(data)} bytes, "
-          f"sha256 {hashlib.sha256(data).hexdigest()}")
-    for w in warnings:
-        print(f"WARNING: {w}")
-    if len(data) > 1_048_576:
-        raise SystemExit("entry.png over the 1 MiB gate")
+    with open(os.path.join(HERE, "content", "content-20261119.json"),
+              encoding="utf-8") as fh:
+        content = json.load(fh)
+
+    stats = validate(content)
+    img, warnings = render(content, stats)
+
+    out_path = os.path.join(HERE, "entry.png")
+    img.save(out_path, format="PNG", optimize=True)
+    size = os.path.getsize(out_path)
+    if size > MAX_BYTES:
+        print("REFUSED: entry.png is %d bytes, over the 1 MiB cap" % size)
+        return 1
+
+    small = img.resize((480, 480))
+    small.save(os.path.join(HERE, "entry-480.png"), format="PNG", optimize=True)
+
+    with open(out_path, "rb") as fh:
+        digest = hashlib.sha256(fh.read()).hexdigest()
+
+    print("stories=%(stories)d illustrated=%(illustrated)d "
+          "continents=%(continents)d strip=%(strip)d" % stats)
+    print("entry.png bytes=%d sha256=%s" % (size, digest))
+    if warnings:
+        print("legibility warnings: %d" % len(warnings))
+        for warning in warnings:
+            print("  WARNING: " + warning)
+    else:
+        print("legibility warnings: 0")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

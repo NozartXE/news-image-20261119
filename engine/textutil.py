@@ -1,113 +1,80 @@
-"""Text and drawing utilities for the news-image engine.
+"""Small deterministic text helpers built on PIL's ImageFont.
 
-Deterministic helpers only: font loading, measuring, wrapping and
-fitting text to a box by shrinking the point size until it fits.
-No randomness, no network, no external assets beyond system fonts.
+Everything here is a pure function of (text, font, width): no caching
+tricks, no randomness, so two runs always agree on line breaks.
 """
-
-from pathlib import Path
 
 from PIL import ImageFont
 
-FONT_DIR = Path("/usr/share/fonts/truetype")
-SERIF_BOLD = str(FONT_DIR / "dejavu" / "DejaVuSerif-Bold.ttf")
-SERIF = str(FONT_DIR / "dejavu" / "DejaVuSerif.ttf")
-SANS = str(FONT_DIR / "liberation" / "LiberationSans-Regular.ttf")
-SANS_BOLD = str(FONT_DIR / "liberation" / "LiberationSans-Bold.ttf")
+FONT_DIR = "/usr/share/fonts/truetype/dejavu"
+SERIF_BOLD = FONT_DIR + "/DejaVuSerif-Bold.ttf"
+SANS_BOLD = FONT_DIR + "/DejaVuSans-Bold.ttf"
+SANS = FONT_DIR + "/DejaVuSans.ttf"
 
 _cache = {}
 
 
 def font(path, size):
-    key = (path, size)
+    """Load (and memoise) a TrueType font at an integer size."""
+    key = (path, int(size))
     if key not in _cache:
-        _cache[key] = ImageFont.truetype(path, size)
+        _cache[key] = ImageFont.truetype(path, int(size))
     return _cache[key]
 
 
-def text_w(draw, s, fnt):
-    box = draw.textbbox((0, 0), s, font=fnt)
-    return box[2] - box[0]
+def width_of(text, fnt):
+    """Pixel width of a single-line string under the given font."""
+    if not text:
+        return 0
+    left, _top, right, _bottom = fnt.getbbox(text)
+    return right - left
 
 
-def text_h(fnt):
-    box = fnt.getbbox("Ag")
-    return box[3] - box[1]
-
-
-def centred(draw, cx, y, s, fnt, fill):
-    draw.text((cx - text_w(draw, s, fnt) / 2, y), s, font=fnt, fill=fill)
-
-
-def wrap(draw, s, fnt, width):
-    """Greedy word wrap measured against real font metrics."""
-    lines, cur = [], ""
-    for word in s.split():
-        trial = word if not cur else cur + " " + word
-        if text_w(draw, trial, fnt) <= width:
-            cur = trial
+def wrap(text, fnt, max_width):
+    """Greedy word wrap. Returns a list of lines, each <= max_width wide
+    (a single over-long word is returned on its own line, unsplit)."""
+    words = text.split()
+    lines = []
+    current = ""
+    for word in words:
+        trial = word if not current else current + " " + word
+        if width_of(trial, fnt) <= max_width or not current:
+            current = trial
         else:
-            if cur:
-                lines.append(cur)
-            cur = word
-    if cur:
-        lines.append(cur)
+            lines.append(current)
+            current = word
+    if current:
+        lines.append(current)
     return lines
 
 
-def fit_lines(draw, s, path, start_size, width, max_lines, min_size=9):
-    """Wrap s at start_size; shrink until it fits max_lines.
+ELLIPSIS = "…"
 
-    Returns (font, lines). If it still does not fit at min_size, the
-    last line is ellipsised so the box never overflows silently.
+
+def fit_to_width(text, path, start_size, max_width, floor_size):
+    """Find the largest size in [floor_size, start_size] whose font fits
+    the whole text on one line within max_width.
+
+    Returns (font, size, fits). fits is False when even the floor size
+    overflows; the caller then knows an ellipsis would be needed and can
+    treat that as a legibility failure instead of printing it.
     """
-    size = start_size
-    while size > min_size:
+    size = int(start_size)
+    while size > floor_size:
         fnt = font(path, size)
-        lines = wrap(draw, s, fnt, width)
-        if len(lines) <= max_lines:
-            return fnt, lines
+        if width_of(text, fnt) <= max_width:
+            return fnt, size, True
         size -= 1
-    fnt = font(path, min_size)
-    lines = wrap(draw, s, fnt, width)[:max_lines]
-    if lines:
-        last = lines[-1]
-        while last and text_w(draw, last + "…", fnt) > width:
-            last = last[:-1]
-        lines[-1] = last + "…" if last else "…"
-    return fnt, lines
+    fnt = font(path, floor_size)
+    return fnt, floor_size, width_of(text, fnt) <= max_width
 
 
-def fit_single(draw, s, path, start_size, width, min_size=9):
-    """Single line: shrink until it fits the width. Returns (font, text)."""
-    size = start_size
-    while size > min_size:
-        fnt = font(path, size)
-        if text_w(draw, s, fnt) <= width:
-            return fnt, s
-        size -= 1
-    fnt = font(path, min_size)
-    out = s
-    while out and text_w(draw, out + "…", fnt) > width:
-        out = out[:-1]
-    return fnt, out + "…" if out else "…"
-
-
-def block(draw, x, y, lines, fnt, leading, fill):
-    for line in lines:
-        draw.text((x, y), line, font=fnt, fill=fill)
-        y += leading
-    return y
-
-
-def gradient(draw, x0, y0, x1, y1, top, bottom):
-    """Vertical two-stop gradient, drawn line by line (deterministic)."""
-    h = max(1, y1 - y0)
-    for yy in range(y0, y1):
-        t = (yy - y0) / h
-        col = tuple(int(top[i] + (bottom[i] - top[i]) * t) for i in range(3))
-        draw.line([(x0, yy), (x1, yy)], fill=col)
-
-
-def lerp(top, bottom, t):
-    return tuple(int(top[i] + (bottom[i] - top[i]) * t) for i in range(3))
+def ellipsise(text, fnt, max_width):
+    """Shorten text with a trailing ellipsis until it fits max_width.
+    Returns the shortened string (detectable: it ends with ELLIPSIS)."""
+    if width_of(text, fnt) <= max_width:
+        return text
+    trimmed = text
+    while trimmed and width_of(trimmed + ELLIPSIS, fnt) > max_width:
+        trimmed = trimmed[:-1].rstrip()
+    return trimmed + ELLIPSIS if trimmed else ELLIPSIS

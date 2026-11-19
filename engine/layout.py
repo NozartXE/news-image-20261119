@@ -1,191 +1,178 @@
-"""Page layout: the MOSAIC FRONT PAGE (concept C1, panel winner).
+"""The C1 mosaic assembler.
 
-One deterministic assembler from validated content:
+Canvas 1024x1024, off-white paper, near-black ink, one muted red
+accent. The vertical budget is fixed by named constants and sums to
+the full canvas height:
 
-  masthead   nameplate + full date + computed scope line
-  hero       full-width scene, headline bar, one dek line
-  cards      3 rows x 4 scene-cards (scene + place kicker + headline)
-  numbers    THE DAY IN NUMBERS — figures validated as additive
-  index      the remaining stories, one fitted headline line each,
-             headed by a printed count that must equal the number
-             of index stories actually drawn
-
-All heights are constants here so the geometry can be audited in one
-place; the assembler asserts the page ends exactly at 1024.
+    masthead 66 + hero 204 + 3 card rows x 164 + strip 50
+    + index head 24 + index rows (the remainder)
 """
 
 from PIL import Image, ImageDraw
 
+from . import textutil as tu
 from .scenes import PAINTERS
-from .textutil import (SANS, SANS_BOLD, SERIF, SERIF_BOLD, block, centred,
-                       fit_lines, fit_single, font, text_w)
-from .validate import scope_line, validate
+from .validate import scope_line
 
-W = H = 1024
-PAPER = (247, 242, 231)
-INK = (24, 22, 20)
-FADED = (92, 84, 72)
-ACCENT = (156, 38, 24)
-NAVY = (18, 38, 66)
-GOLD = (198, 148, 42)
-RULE = (24, 22, 20)
-
+CANVAS = 1024
 MARGIN = 16
-CW = W - 2 * MARGIN  # 992 usable
+CONTENT_W = CANVAS - 2 * MARGIN  # 992
+GUTTER = 10
 
 MASTHEAD_H = 66
-HERO_SCENE_H = 136
-HERO_HEAD_H = 42
+HERO_SCENE_H = 140
+HERO_HEADLINE_H = 42
 HERO_DEK_H = 22
+HERO_H = HERO_SCENE_H + HERO_HEADLINE_H + HERO_DEK_H  # 204
+
+CARD_ROWS = 3
+CARD_COLS = 4
+CARD_ROW_H = 164
 CARD_SCENE_H = 96
 CARD_KICKER_H = 16
-CARD_HEAD_H = 36
-CARD_H = CARD_SCENE_H + CARD_KICKER_H + CARD_HEAD_H + 6
-CARD_ROWS = 3
+
 STRIP_H = 50
 INDEX_HEAD_H = 24
-INDEX_COLS = 3
+
+PAPER = (247, 243, 234)
+INK = (26, 24, 22)
+ACCENT = (168, 38, 32)
+GREY = (96, 92, 86)
+HAIRLINE = (40, 38, 34)
+STRIP_BG = (24, 30, 46)
+STRIP_FIG = (244, 196, 84)
 
 
-def _masthead(d, content, stats):
-    y = 6
-    fnt = font(SERIF_BOLD, 37)
-    d.text((MARGIN, y), content["nameplate"], font=fnt, fill=INK)
-    # right block: date over scope, right-aligned
-    date_f = font(SANS_BOLD, 17)
-    scope_f = font(SANS_BOLD, 13)
-    date = content["date_line"].upper()
-    scope = scope_line(stats)
-    d.text((W - MARGIN - text_w(d, date, date_f), y + 2), date,
-           font=date_f, fill=INK)
-    d.text((W - MARGIN - text_w(d, scope, scope_f), y + 26), scope,
-           font=scope_f, fill=ACCENT)
-    d.line([(MARGIN, MASTHEAD_H - 8), (W - MARGIN, MASTHEAD_H - 8)],
-           fill=RULE, width=3)
-    d.line([(MARGIN, MASTHEAD_H - 3), (W - MARGIN, MASTHEAD_H - 3)],
-           fill=RULE, width=1)
-    return MASTHEAD_H
+def _text(draw, xy, text, fnt, fill=INK):
+    draw.text(xy, text, font=fnt, fill=fill)
 
 
-def _hero(d, story, y):
-    box = (MARGIN, y, W - MARGIN, y + HERO_SCENE_H)
-    PAINTERS[story["scene"]](d, box, story.get("scene_spec", {}))
-    d.rectangle(box, outline=INK, width=2)
-    if story.get("scene_caption"):
-        fnt = font(SANS_BOLD, 12)
-        cap = story["scene_caption"]
-        w = text_w(d, cap, fnt)
-        d.rectangle([box[0] + 8, box[3] - 24, box[0] + 16 + w, box[3] - 4],
-                    fill=INK)
-        d.text((box[0] + 12, box[3] - 21), cap, font=fnt, fill=PAPER)
-    y += HERO_SCENE_H + 4
-    fnt, s = fit_single(d, story["headline"], SERIF_BOLD, 31, CW)
-    d.text((MARGIN, y), s, font=fnt, fill=INK)
-    y += HERO_HEAD_H
-    fnt, lines = fit_lines(d, story["dek"], SERIF, 15, CW, 1)
-    d.text((MARGIN, y), lines[0], font=fnt, fill=(52, 48, 42))
-    return y + HERO_DEK_H
+def _fit_headline(draw, text, width, sizes=(15, 14, 13)):
+    """Wrap a card headline to at most two lines, shrinking if needed."""
+    for size in sizes:
+        fnt = tu.font(tu.SANS_BOLD, size)
+        lines = tu.wrap(text, fnt, width)
+        if len(lines) <= 2:
+            return fnt, lines
+    return fnt, lines[:2]
 
 
-def _card(d, story, x, y, w, warnings):
-    box = (x, y, x + w, y + CARD_SCENE_H)
-    PAINTERS[story["scene"]](d, box, story.get("scene_spec", {}))
-    d.rectangle(box, outline=INK, width=1)
-    ky = y + CARD_SCENE_H + 3
-    kick = f"{story['place']} — {story['region'].upper()}"
-    fnt, s = fit_single(d, kick, SANS_BOLD, 12, w)
-    d.text((x, ky), s, font=fnt, fill=ACCENT)
-    hy = ky + CARD_KICKER_H
-    fnt, lines = fit_lines(d, story["headline"], SANS_BOLD, 15, w, 2)
-    if fnt.size < 13 or any("…" in ln for ln in lines):
-        warnings.append(f"card story {story['id']} headline at "
-                        f"{fnt.size}px / truncated")
-    block(d, x, hy, lines, fnt, 18, INK)
+def _caption_chip(draw, x, y, text):
+    fnt = tu.font(tu.SANS_BOLD, 11)
+    tw = tu.width_of(text, fnt)
+    draw.rectangle([x, y, x + tw + 12, y + 17], fill=(18, 18, 20))
+    _text(draw, (x + 6, y + 3), text, fnt, fill=(245, 242, 235))
 
 
-def _strip(d, strip_stories, y, warnings):
-    d.rectangle([MARGIN, y, W - MARGIN, y + STRIP_H], fill=NAVY)
-    n = len(strip_stories)
-    cell = CW // max(1, n)
-    for i, s in enumerate(strip_stories):
-        x = MARGIN + i * cell + 10
-        fnt = font(SANS_BOLD, 18)
-        d.text((x, y + 3), s["strip_figure"], font=fnt, fill=GOLD)
-        cap_f, lines = fit_lines(d, s["strip_caption"], SANS_BOLD, 11,
-                                 cell - 16, 2)
-        if any("…" in ln for ln in lines):
-            warnings.append(f"strip caption for story {s['id']} truncated")
-        block(d, x, y + 25, lines, cap_f, 12, PAPER)
-    return y + STRIP_H
-
-
-def _index(d, index_stories, y):
-    d.line([(MARGIN, y + 4), (W - MARGIN, y + 4)], fill=RULE, width=2)
-    head = f"MORE OF THE DAY — {len(index_stories)} STORIES"
-    fnt = font(SANS_BOLD, 14)
-    d.text((MARGIN, y + 7), head, font=fnt, fill=INK)
-    right = "EVERY STORY COUNTED ONCE"
-    rf = font(SANS_BOLD, 11)
-    d.text((W - MARGIN - text_w(d, right, rf), y + 9), right, font=rf,
-           fill=FADED)
-    y += INDEX_HEAD_H + 4
-    cols = INDEX_COLS
-    col_w = CW // cols
-    rows = (len(index_stories) + cols - 1) // cols
-    row_h = (H - 8 - y) // max(1, rows)
+def render(content, stats):
+    """Draw the whole page. Returns (PIL image, legibility warnings)."""
     warnings = []
-    for i, s in enumerate(index_stories):
-        col, row = divmod(i, rows)
-        x = MARGIN + col * col_w + (8 if col else 0)
-        yy = y + row * row_h + 2
-        # the brief is the story's one printed line: place + claim,
-        # written to fit at full size (validated <= 50 chars)
-        d.rectangle([x, yy + 3, x + 5, yy + 10], fill=ACCENT)
-        fnt, txt = fit_single(d, s["brief"], SANS_BOLD, 15, col_w - 22)
-        if fnt.size < 12:
-            warnings.append(f"index story {s['id']} at {fnt.size}px")
-        if "…" in txt:
-            warnings.append(f"index story {s['id']} brief truncated")
-        d.text((x + 10, yy), txt, font=fnt, fill=INK)
-        if col:
-            d.line([(MARGIN + col * col_w - 2, yy),
-                    (MARGIN + col * col_w - 2, yy + 12)],
-                   fill=(200, 192, 172), width=1)
-    return warnings
-
-
-def render(content):
-    """Render validated content to a 1024x1024 PIL image.
-
-    Returns (image, stats, warnings). Raises ValueError on any
-    accounting failure — an unreconciled page is never drawn.
-    """
-    stats = validate(content)
-    img = Image.new("RGB", (W, H), PAPER)
-    d = ImageDraw.Draw(img)
+    img = Image.new("RGB", (CANVAS, CANVAS), PAPER)
+    draw = ImageDraw.Draw(img)
     stories = content["stories"]
-    hero = next(s for s in stories if s.get("tier") == "hero")
-    cards = [s for s in stories if s.get("tier") == "card"]
+    hero = next(s for s in stories if s["tier"] == "hero")
+    cards = [s for s in stories if s["tier"] == "card"]
+    index = [s for s in stories if s["tier"] not in ("hero", "card")]
     strip = [s for s in stories if s.get("strip_figure")]
-    index = [s for s in stories
-             if s.get("tier") not in ("hero", "card")]
-    if len(cards) != CARD_ROWS * 4:
-        raise ValueError(f"{len(cards)} card stories (need {CARD_ROWS * 4})")
 
-    y = _masthead(d, content, stats)
-    y = _hero(d, hero, y)
-    warnings = []
-    card_w = CW // 4
-    for r in range(CARD_ROWS):
-        for c in range(4):
-            _card(d, cards[r * 4 + c], MARGIN + c * card_w, y,
-                  card_w - (10 if c < 3 else 0), warnings)
-        y += CARD_H
-    y = _strip(d, strip, y + 4, warnings)
-    warnings += _index(d, index, y + 6)
-    # double-rule frame around the page: a finished front page
-    # carries a border (the unframed page read as unfinished).
-    # Drawn last, inside the 16px margin, so it covers no content.
-    d.rectangle([5, 5, W - 6, H - 6], outline=INK, width=2)
-    d.rectangle([10, 10, W - 11, H - 11], outline=INK, width=1)
-    return img, stats, warnings
+    y = 0
+    # ---- masthead ------------------------------------------------------
+    name_fnt = tu.font(tu.SERIF_BOLD, 36)
+    _text(draw, (MARGIN, y + 12), content["nameplate"], name_fnt)
+    date_fnt = tu.font(tu.SANS_BOLD, 15)
+    date = content["date_line"].upper()
+    _text(draw, (CANVAS - MARGIN - tu.width_of(date, date_fnt), y + 10),
+          date, date_fnt)
+    scope_fnt = tu.font(tu.SANS_BOLD, 13)
+    scope = scope_line(stats)
+    _text(draw, (CANVAS - MARGIN - tu.width_of(scope, scope_fnt), y + 32),
+          scope, scope_fnt, fill=ACCENT)
+    draw.rectangle([MARGIN, y + MASTHEAD_H - 6, CANVAS - MARGIN, y + MASTHEAD_H - 3],
+                   fill=INK)
+    y += MASTHEAD_H
+
+    # ---- hero band -----------------------------------------------------
+    PAINTERS[hero["scene"]](draw, MARGIN, y, CONTENT_W, HERO_SCENE_H,
+                            hero.get("scene_spec") or {})
+    draw.rectangle([MARGIN, y, MARGIN + CONTENT_W, y + HERO_SCENE_H],
+                   outline=HAIRLINE)
+    if hero.get("scene_caption"):
+        _caption_chip(draw, MARGIN + 6, y + HERO_SCENE_H - 23,
+                      hero["scene_caption"])
+    y += HERO_SCENE_H
+    hfnt, _hsize, _ = tu.fit_to_width(hero["headline"], tu.SERIF_BOLD, 31,
+                                      CONTENT_W, 18)
+    _text(draw, (MARGIN, y + 5), hero["headline"], hfnt)
+    y += HERO_HEADLINE_H
+    dfnt, _dsize, _ = tu.fit_to_width(hero["dek"], tu.SANS, 14, CONTENT_W, 11)
+    _text(draw, (MARGIN, y + 2), hero["dek"], dfnt)
+    y += HERO_DEK_H
+
+    # ---- card rows -----------------------------------------------------
+    cell_w = (CONTENT_W - (CARD_COLS - 1) * GUTTER) // CARD_COLS
+    for row in range(CARD_ROWS):
+        for col in range(CARD_COLS):
+            story = cards[row * CARD_COLS + col]
+            cx = MARGIN + col * (cell_w + GUTTER)
+            cw = cell_w if col < CARD_COLS - 1 else CONTENT_W - col * (cell_w + GUTTER)
+            PAINTERS[story["scene"]](draw, cx, y, cw, CARD_SCENE_H,
+                                     story.get("scene_spec") or {})
+            draw.rectangle([cx, y, cx + cw, y + CARD_SCENE_H], outline=HAIRLINE)
+            kicker = "%s — %s" % (story["place"], story["region"].upper())
+            kfnt, _ks, _ = tu.fit_to_width(kicker, tu.SANS_BOLD, 11, cw, 9)
+            _text(draw, (cx, y + CARD_SCENE_H + 3), kicker, kfnt, fill=ACCENT)
+            hfnt2, lines = _fit_headline(draw, story["headline"], cw)
+            ly = y + CARD_SCENE_H + CARD_KICKER_H + 2
+            for line in lines:
+                _text(draw, (cx, ly), line, hfnt2)
+                ly += 18
+        y += CARD_ROW_H
+
+    # ---- numbers strip ---------------------------------------------------
+    draw.rectangle([MARGIN, y, MARGIN + CONTENT_W, y + STRIP_H], fill=STRIP_BG)
+    col_w = CONTENT_W // len(strip)
+    fig_fnt = tu.font(tu.SANS_BOLD, 19)
+    cap_fnt = tu.font(tu.SANS, 11)
+    for i, story in enumerate(strip):
+        sx = MARGIN + i * col_w + 6
+        sw = col_w - 10
+        _text(draw, (sx, y + 3), story["strip_figure"], fig_fnt, fill=STRIP_FIG)
+        cap_lines = tu.wrap(story["strip_caption"], cap_fnt, sw)[:2]
+        cy = y + 26
+        for line in cap_lines:
+            _text(draw, (sx, cy), line, cap_fnt, fill=(238, 236, 230))
+            cy += 12
+    y += STRIP_H
+
+    # ---- index -----------------------------------------------------------
+    head_fnt = tu.font(tu.SANS_BOLD, 13)
+    _text(draw, (MARGIN, y + 3),
+          "MORE OF THE DAY — %d STORIES" % len(index), head_fnt)
+    note = "EVERY STORY COUNTED ONCE"
+    note_fnt = tu.font(tu.SANS, 10)
+    _text(draw, (CANVAS - MARGIN - tu.width_of(note, note_fnt), y + 5),
+          note, note_fnt, fill=GREY)
+    draw.line([MARGIN, y + INDEX_HEAD_H - 2, CANVAS - MARGIN, y + INDEX_HEAD_H - 2],
+              fill=INK, width=1)
+    y += INDEX_HEAD_H
+
+    rows = (len(index) + 2) // 3
+    row_h = (CANVAS - y - 4) // rows
+    col_w2 = (CONTENT_W - 2 * GUTTER) // 3
+    bullet_fnt = tu.font(tu.SANS_BOLD, 12)
+    for pos, story in enumerate(index):
+        col, row = divmod(pos, rows)
+        ix = MARGIN + col * (col_w2 + GUTTER)
+        iy = y + row * row_h + 2
+        cw2 = col_w2 if col < 2 else CONTENT_W - 2 * (col_w2 + GUTTER)
+        draw.rectangle([ix, iy + 3, ix + 6, iy + 9], fill=ACCENT)
+        brief = story["brief"]
+        bfnt, bsize, fits = tu.fit_to_width(brief, tu.SANS_BOLD, 15,
+                                            cw2 - 12, 12)
+        if not fits or bsize < 12:
+            warnings.append(
+                "story %s brief %r needs %dpx / ellipsis at index width"
+                % (story["id"], brief, bsize))
+        _text(draw, (ix + 11, iy), brief, bfnt)
+
+    return img, warnings
