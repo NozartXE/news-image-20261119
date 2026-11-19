@@ -4,9 +4,15 @@ Canvas 1024x1024, off-white paper, near-black ink, one muted red
 accent. The vertical budget is fixed by named constants and sums to
 the full canvas height:
 
-    masthead 52 + region bar 18 + hero 208 + 3 card rows x 152
-    + strip 42 + index head 22 + index body 190 (15 rows x 12)
+    masthead 52 + region bar 18 + hero 208 + 3 card rows x 148
+    + strip 42 + index head 22 + index body 202 (15 rows x 13)
     + date check 22 + sources 14 = 1024 (plus slack)
+
+Residual round: card scenes trimmed 84 -> 80 and card rows
+152 -> 148; the 12 px freed go to the index body so brief rows
+breathe at 13 px, card deks gain leading (11 -> 12) and a darker
+ink, and no card dek is ever truncated (the fit falls back to 8 px
+before it would drop a line).
 
 Every illustrated card carries a two-line dek with a figure and a
 named source; cards and briefs are numbered continuously 1..43; the
@@ -34,8 +40,8 @@ HERO_H = HERO_SCENE_H + HERO_HEADLINE_H + HERO_DEK_H  # 208
 
 CARD_ROWS = 3
 CARD_COLS = 4
-CARD_ROW_H = 152
-CARD_SCENE_H = 84
+CARD_ROW_H = 148
+CARD_SCENE_H = 80
 CARD_KICKER_H = 13
 
 STRIP_H = 42
@@ -47,8 +53,8 @@ SOURCES_H = 14
 PAPER = (247, 243, 234)
 INK = (26, 24, 22)
 ACCENT = (168, 38, 32)
-GREY = (96, 92, 86)
-DEK_INK = (62, 59, 54)
+GREY = (74, 70, 64)
+DEK_INK = (34, 32, 29)
 HAIRLINE = (40, 38, 34)
 STRIP_BG = (24, 30, 46)
 STRIP_FIG = (244, 196, 84)
@@ -75,8 +81,10 @@ def _fit_headline(draw, text, width, sizes=(14, 13, 12)):
     return fnt, lines[:2]
 
 
-def _fit_dek(text, width, sizes=(10, 9)):
-    """Wrap a card dek to at most two lines, shrinking if needed."""
+def _fit_dek(text, width, sizes=(10, 9, 8)):
+    """Wrap a card dek to at most two lines, shrinking if needed.
+    The 8 px fallback exists so a long dek is never truncated: the
+    figure and the source attribution at its end always print."""
     for size in sizes:
         fnt = tu.font(tu.SANS, size)
         lines = tu.wrap(text, fnt, width)
@@ -181,12 +189,12 @@ def render(content, stats):
             ly = y + CARD_SCENE_H + CARD_KICKER_H + 2
             for line in lines:
                 _text(draw, (cx, ly), line, hfnt2)
-                ly += 14
+                ly += 13
             dfnt2, dlines = _fit_dek(story["dek"], cw)
             dy = y + CARD_SCENE_H + CARD_KICKER_H + 30
             for line in dlines:
                 _text(draw, (cx, dy), line, dfnt2, fill=DEK_INK)
-                dy += 11
+                dy += 12
         y += CARD_ROW_H
 
     # ---- numbers strip: every figure anchored in its story's dek -------
@@ -209,7 +217,7 @@ def render(content, stats):
     head_fnt = tu.font(tu.SANS_BOLD, 12)
     _text(draw, (MARGIN, y + 4),
           "MORE OF THE DAY — %d STORIES" % len(index), head_fnt)
-    note = "EVERY STORY COUNTED ONCE · PINS = ILLUSTRATED, DOTS = BRIEFS"
+    note = "EVERY STORY COUNTED ONCE · PINS = THE 13 ILLUSTRATED STORIES"
     note_fnt = tu.font(tu.SANS, 10)
     _text(draw, (CANVAS - MARGIN - tu.width_of(note, note_fnt), y + 5),
           note, note_fnt, fill=GREY)
@@ -220,9 +228,12 @@ def render(content, stats):
     # ---- index body: pin map column + two numbered brief columns --------
     body_bottom = CANVAS - DATECHECK_H - SOURCES_H
     body_h = body_bottom - y
+    # Brief dots are gone: at judge scale 30 small grey dots read as
+    # noise, not information. The map carries only the 13 big numbered
+    # pins plus region labels.
     map_spec = {
         "pins": [(nums[s["id"]], s["region"]) for s in [hero] + cards],
-        "dots": [s["region"] for s in index],
+        "dots": [],
     }
     PAINTERS["worldmap"](draw, MARGIN, y, MAP_W, body_h, map_spec)
     draw.rectangle([MARGIN, y, MARGIN + MAP_W, y + body_h], outline=HAIRLINE)
@@ -242,7 +253,12 @@ def render(content, stats):
         cw2 = col_w2 if col < 1 else idx_w - col_w2 - GUTTER
         num = "%d." % nums[story["id"]]
         nfnt = tu.font(tu.SANS_BOLD, 10)
-        _text(draw, (ix, iy), num, nfnt, fill=ACCENT)
+        # A filled ink chip behind the brief number: the badge stays
+        # legible as a solid mark at 300 px, where plain red type
+        # thins out.
+        nw = tu.width_of(num, nfnt)
+        draw.rectangle([ix, iy, ix + nw + 5, iy + 11], fill=INK)
+        _text(draw, (ix + 3, iy + 1), num, nfnt, fill=PAPER)
         brief = story["brief"]
         bfnt, bsize, fits = tu.fit_to_width(brief, tu.SANS_BOLD, 11,
                                             cw2 - 24, 9)

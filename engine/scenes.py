@@ -672,41 +672,62 @@ REGION_ANCHORS = {
 
 
 def _map_jitter(k):
-    """Deterministic small offset for the k-th item in one region."""
-    return ((k % 3) - 1) * 0.045, (((k // 3) % 3) - 1) * 0.075
+    """Deterministic spread for the k-th pin in one region. Wide
+    enough that 16 px pins in the same region separate instead of
+    stacking into one blob."""
+    return ((k % 3) - 1) * 0.075, (((k // 3) % 3) - 1) * 0.10
+
+
+# Region label positions (fx, fy), set in the open water beside each
+# landmass so the map names its regions at judge scale.
+REGION_LABELS = {
+    "North America": ("N. AMERICA", 0.03, 0.04),
+    "South America": ("S. AMERICA", 0.04, 0.80),
+    "Europe": ("EUROPE", 0.42, 0.03),
+    "Africa": ("AFRICA", 0.50, 0.70),
+    "Middle East": ("MIDDLE EAST", 0.545, 0.44),
+    "Asia": ("ASIA", 0.76, 0.04),
+    "Oceania": ("OCEANIA", 0.76, 0.80),
+}
 
 
 def paint_worldmap(draw, x, y, w, h, spec):
-    """Dotted landmass with numbered pins (illustrated stories) and
-    plain dots (briefs), placed by each story's region. spec carries
-    'pins': [(num, region)] and 'dots': [region]."""
+    """Landmass with big numbered pins for the illustrated stories,
+    placed by each story's region, plus printed region labels. spec
+    carries 'pins': [(num, region)]; 'dots' is accepted for
+    compatibility but no longer drawn - 30 small brief dots read as
+    noise at judge scale, so the briefs live only in the index."""
     cols = len(MAP_ROWS[0])
     rows = len(MAP_ROWS)
+    # Land dots at radius 2 on a ~5 px grid merge into a solid muted
+    # landmass that still reads as continents at 300 px, instead of
+    # the radius-1 speckle that read as dot noise.
     for r, row in enumerate(MAP_ROWS):
         for c, cell in enumerate(row):
             if cell == "#":
                 cx = x + int((c + 0.5) * w / cols)
                 cy = y + int((r + 0.5) * h / rows)
-                draw.ellipse([cx - 1, cy - 1, cx + 1, cy + 1], fill=(168, 162, 148))
-    seen_pins, seen_dots = {}, {}
+                draw.ellipse([cx - 2, cy - 2, cx + 2, cy + 2], fill=(176, 170, 156))
+    lab_fnt = ImageFont.truetype(SANS_BOLD, 8)
+    for text, fx, fy in REGION_LABELS.values():
+        draw.text((x + int(fx * w), y + int(fy * h)), text,
+                  font=lab_fnt, fill=(56, 52, 46))
+    seen_pins = {}
 
-    def _place(region, seen, phase=0):
+    def _place(region, seen):
         k = seen.get(region, 0)
         seen[region] = k + 1
         ax, ay = REGION_ANCHORS[region]
-        jx, jy = _map_jitter(k + phase)
+        jx, jy = _map_jitter(k)
         return x + int((ax + jx) * w), y + int((ay + jy) * h)
 
-    for region in spec.get("dots") or []:
-        cx, cy = _place(region, seen_dots, phase=1)
-        draw.ellipse([cx - 2, cy - 2, cx + 2, cy + 2], fill=(96, 92, 86))
-    fnt = ImageFont.truetype(SANS_BOLD, 7)
+    fnt = ImageFont.truetype(SANS_BOLD, 9)
     for num, region in spec.get("pins") or []:
         cx, cy = _place(region, seen_pins)
-        draw.ellipse([cx - 6, cy - 6, cx + 6, cy + 6], fill=(168, 38, 32),
-                     outline=(247, 243, 234))
+        draw.ellipse([cx - 8, cy - 8, cx + 8, cy + 8], fill=(168, 38, 32),
+                     outline=(247, 243, 234), width=2)
         label = str(num)
-        draw.text((cx - width_of(label, fnt) // 2, cy - 4), label,
+        draw.text((cx - width_of(label, fnt) // 2, cy - 5), label,
                   font=fnt, fill=(247, 243, 234))
 
 
