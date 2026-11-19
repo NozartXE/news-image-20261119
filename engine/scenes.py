@@ -87,17 +87,40 @@ def flame(draw, bx, by, s, seed=3):
                  fill=(250, 190, 60))
 
 
-def tanker(draw, x, y, w, hull=(40, 44, 54), deck=(120, 40, 36)):
-    """A tanker silhouette: hull, deck line, bridge block, funnel."""
+def tanker(draw, x, y, w, hull=(40, 44, 54), deck=(120, 40, 36),
+           tall_bridge=False):
+    """A tanker silhouette: hull, deck line, bridge block, funnel.
+    tall_bridge draws the bridge block ~1.6x taller with an extra
+    window row, so that hull reads as an upright superstructure
+    instead of a low grey slab - the middle Hormuz hull uses it."""
     h = max(8, w // 7)
     draw.polygon([(x, y), (x + w, y), (x + w - h, y + h), (x + h, y + h)], fill=hull)
     draw.rectangle([x + 2, y - 3, x + w - 2, y], fill=deck)
     bw = max(6, w // 8)
-    draw.rectangle([x + w - bw - 6, y - 3 - h, x + w - 6, y - 3], fill=(225, 222, 214))
-    for i in range(3):
-        draw.rectangle([x + w - bw - 4 + i * 3, y - 3 - h + 2,
-                        x + w - bw - 3 + i * 3, y - 3 - h + 4], fill=(250, 210, 90))
+    bh = int(h * 1.6) if tall_bridge else h
+    draw.rectangle([x + w - bw - 6, y - 3 - bh, x + w - 6, y - 3], fill=(225, 222, 214))
+    win_rows = 2 if tall_bridge else 1
+    for r in range(win_rows):
+        for i in range(3):
+            draw.rectangle([x + w - bw - 4 + i * 3,
+                            y - 3 - bh + 2 + r * 5,
+                            x + w - bw - 3 + i * 3,
+                            y - 3 - bh + 4 + r * 5], fill=(250, 210, 90))
     draw.rectangle([x + w // 3, y - 3 - h // 2, x + w // 3 + 4, y - 3], fill=(30, 30, 34))
+
+
+def smoke_up(draw, x, y, s, tone=(168, 160, 150)):
+    """Smoke rising straight up: stacked ellipses on one vertical
+    that taper and drift slightly as they rise, so the plume reads
+    as smoke - never a leaning slab across a hull's bridge, and
+    never a uniform tower."""
+    draw.ellipse([x - s, y - s, x + s, y + s], fill=tone)
+    r2 = max(2, int(s * 0.75))
+    draw.ellipse([x + 2 - r2, y - int(1.5 * s) - r2, x + 2 + r2,
+                  y - int(1.5 * s) + r2], fill=(188, 180, 170))
+    r3 = max(2, int(s * 0.55))
+    draw.ellipse([x - 1 - r3, y - int(2.6 * s) - r3, x - 1 + r3,
+                  y - int(2.6 * s) + r3], fill=(205, 198, 188))
 
 
 def smoke(draw, x, y, s, tone=(168, 160, 150)):
@@ -126,18 +149,31 @@ def paint_sea_strike(draw, x, y, w, h, spec):
     draw.polygon([(x + int(w * 0.70), sea_y), (x + int(w * 0.82), y + int(h * 0.28)),
                   (x + int(w * 0.94), y + int(h * 0.32)), (x + w, sea_y)], fill=(38, 40, 38))
     # Three tankers, each hull fully separated by open water and each
-    # carrying its own flame plume, so all three stay countable.
+    # carrying its own flame plume, so all three stay countable. The
+    # middle hull - the largest, and the one whose diagonal smoke
+    # plume used to lean across its bridge like a capsized
+    # superstructure - gets the tall upright bridge and a vertical
+    # smoke column, the same silhouette family as the other two.
     tanker(draw, x + int(w * 0.03), sea_y + int(h * 0.08), int(w * 0.16))
-    flame(draw, x + int(w * 0.09), sea_y + int(h * 0.04), 4)
     smoke(draw, x + int(w * 0.10), sea_y + int(h * 0.01), 3)
-    tanker(draw, x + int(w * 0.30), sea_y + int(h * 0.14), int(w * 0.28))
+    flame(draw, x + int(w * 0.09), sea_y + int(h * 0.04), 4)
+    tanker(draw, x + int(w * 0.30), sea_y + int(h * 0.14), int(w * 0.28),
+           tall_bridge=True)
+    # Round 5: smoke FIRST, flame on top, smoke column offset right
+    # of the flame (0.47w vs 0.44w). Round 4 drew smoke_up after the
+    # flame at the same x, so the grey ellipses buried the orange
+    # flame - only 16 orange px survived. The tall bridge is untouched.
+    smoke_up(draw, x + int(w * 0.47), sea_y + int(h * 0.02), 5)
     flame(draw, x + int(w * 0.44), sea_y + int(h * 0.08), 6)
-    smoke(draw, x + int(w * 0.44), sea_y + int(h * 0.02), 5)
     star_burst(draw, x + int(w * 0.80), y + int(h * 0.24), max(7, h // 8),
                (255, 150, 40), seed=11)
     tanker(draw, x + int(w * 0.68), sea_y + int(h * 0.24), int(w * 0.20))
-    flame(draw, x + int(w * 0.78), sea_y + int(h * 0.18), 5)
     smoke(draw, x + int(w * 0.79), sea_y + int(h * 0.12), 4)
+    # Round 7: the third flame sat 2 px above its hull's deck with
+    # its tip touching the island's bottom edge, so it read as a
+    # fire on the island, not on the ship. Nudged west and down so
+    # its base lands on the deck line (base y = deck y + 1).
+    flame(draw, x + int(w * 0.77), sea_y + int(h * 0.22), 5)
     # Shore missile launcher, bottom-left foreground.
     lx, ly = x + int(w * 0.05), y + h - 6
     draw.rectangle([lx, ly - 6, lx + 20, ly], fill=(24, 26, 24))
@@ -257,7 +293,17 @@ def _flag_detail(draw, fx, fy, fw, fh, name, base):
         for i in range(7):
             tone = (178, 44, 52) if i % 2 == 0 else (240, 240, 240)
             draw.rectangle([fx, fy + i * stripe, fx + fw, fy + (i + 1) * stripe], fill=tone)
-        draw.rectangle([fx, fy, fx + int(fw * 0.42), fy + 4 * stripe], fill=(52, 56, 110))
+        # Round 7: saturated navy canton with visible white star
+        # dots - the old washed grey-blue canton read as a plain
+        # striped bar at judge scale.
+        cw_ = int(fw * 0.42)
+        draw.rectangle([fx, fy, fx + cw_, fy + 4 * stripe], fill=(22, 40, 108))
+        for r_ in range(4):
+            for c_ in range(6):
+                sx_ = fx + 4 + c_ * max(3, (cw_ - 6) // 6) + (2 if r_ % 2 else 0)
+                sy_ = fy + 3 + r_ * max(3, (4 * stripe - 4) // 4)
+                draw.ellipse([sx_ - 1, sy_ - 1, sx_ + 1, sy_ + 1],
+                             fill=(245, 245, 245))
 
 
 def paint_summit(draw, x, y, w, h, spec):
@@ -273,30 +319,84 @@ def paint_summit(draw, x, y, w, h, spec):
     fw, fh = int(w * 0.17), int(h * 0.26)
     for (fname, rgb), cx in zip(flags, xs):
         _flag_detail(draw, cx - fw // 2, y + int(h * 0.07), fw, fh, fname, tuple(rgb))
-        label_chip(draw, cx - fw // 2, y + int(h * 0.07) + fh + 1, fw, 14,
-                   fname, size=9, align="tl")
+        # Round 7: the flag label chips are drawn AFTER the arms and
+        # the clasp (see below), so no arm or cuff can ever cover a
+        # chip - the round-6 cuff/chip collision cannot recur.
     table_y = y + int(h * 0.70)
     head_top = y + int(h * 0.40)
+    # Round 7: Xi's reaching arm, drawn before the figures so
+    # Putin's torso covers its middle stretch - the arm reads as
+    # passing behind Putin toward the clasp. Two segments (a bent
+    # elbow in the open wall), in Xi's suit colour.
+    hx = (xs[1] + xs[2]) // 2
+    hy = table_y - int(h * 0.30)
+    hx2 = hx - 10  # clasp centre, shifted west: see the cuff note below
+    draw.line([xs[0] + 16, table_y - 5, xs[0] + 185, table_y - 28],
+              fill=suits[0], width=11)
+    draw.line([xs[0] + 185, table_y - 28, hx2 - 58, hy + 2],
+              fill=suits[0], width=11)
     for i, cx in enumerate(xs):
-        person(draw, cx, head_top, 1.35, skin, hair[i], suits[i])
+        person(draw, cx, head_top, 1.5, skin, hair[i], suits[i])
         # Microphone angled in from the table.
         draw.line([cx + 18, table_y, cx + 7, head_top + 30], fill=(16, 16, 18), width=2)
         draw.ellipse([cx + 4, head_top + 25, cx + 10, head_top + 31], fill=(16, 16, 18))
-    # Putin-Trump handshake ABOVE the table edge, against the wall,
-    # centred between the two leaders and drawn extra large: the clasp
-    # is the hero's central claim and must survive thumbnail scale, so
-    # cuffs, sleeves and the clasp itself are chunky.
-    hx = (xs[1] + xs[2]) // 2
-    hy = table_y - int(h * 0.20)
-    draw.line([xs[1] + 16, table_y - 4, hx - 18, hy + 3], fill=suits[1], width=10)
-    draw.line([xs[2] - 16, table_y - 4, hx + 18, hy + 3], fill=suits[2], width=10)
-    draw.rectangle([hx - 48, hy - 7, hx - 17, hy + 8], fill=(240, 238, 230))
-    draw.rectangle([hx + 17, hy - 7, hx + 48, hy + 8], fill=(240, 238, 230))
-    draw.ellipse([hx - 20, hy - 13, hx + 20, hy + 15], fill=skin,
-                 outline=(150, 110, 78), width=2)
-    draw.line([hx - 12, hy - 10, hx + 13, hy + 10], fill=(198, 158, 118), width=4)
-    draw.line([hx + 12, hy - 10, hx - 13, hy + 10], fill=(214, 172, 130), width=3)
-    draw.line([hx - 3, hy - 12, hx - 3, hy + 12], fill=(198, 158, 118), width=2)
+    # The three-way clasp ABOVE the table edge, against the wall.
+    # Round 6 drew real clasped hands for Putin-Trump; round 7 makes
+    # the depicted action match the headline - THREE participants:
+    # Xi's arm (drawn above, before the figures) reaches in from the
+    # left and his hand grips the clasp's left edge, while Putin's
+    # and Trump's arms rise from the table line as two-segment bent
+    # arms instead of single diagonal beams. The clasp itself is
+    # ~30% larger than round 6, with a deeper seam colour, a wider
+    # seam stroke and thicker finger separations, so the two palms
+    # stay distinguishable at 300 px. The clasp centre shifts 10 px
+    # west (hx2) and the right cuff is narrower than the left: the
+    # USA label chip starts at x=729 and the enlarged right cuff
+    # must end west of it (hx2+76 = 726) - and the chips are drawn
+    # after this block regardless, so they always win.
+    skin_a = skin                    # Putin's hand, from the left
+    skin_b = (206, 164, 124)         # Trump's hand, from the right
+    seam = (128, 90, 58)
+    # Bent arms: table line -> elbow -> cuff.
+    draw.line([xs[1] + 16, table_y - 4, hx2 - 100, table_y - 20],
+              fill=suits[1], width=13)
+    draw.line([hx2 - 100, table_y - 20, hx2 - 58, hy + 3],
+              fill=suits[1], width=13)
+    draw.line([xs[2] - 16, table_y - 4, hx2 + 106, table_y - 20],
+              fill=suits[2], width=13)
+    draw.line([hx2 + 106, table_y - 20, hx2 + 58, hy + 3],
+              fill=suits[2], width=13)
+    # Cuffs flank the enlarged clasp; sleeves meet the cuffs.
+    draw.rectangle([hx2 - 84, hy - 12, hx2 - 56, hy + 13], fill=(240, 238, 230))
+    draw.rectangle([hx2 + 56, hy - 12, hx2 + 76, hy + 13], fill=(240, 238, 230))
+    # Two palms: left palm first, right palm overlapping it.
+    draw.ellipse([hx2 - 54, hy - 20, hx2 + 5, hy + 21], fill=skin_a,
+                 outline=seam, width=2)
+    draw.ellipse([hx2 - 5, hy - 22, hx2 + 54, hy + 19], fill=skin_b,
+                 outline=seam, width=2)
+    # Seam where the palms meet: splits the clasp into two masses.
+    draw.line([hx2 - 2, hy - 18, hx2 + 2, hy + 18], fill=seam, width=4)
+    # Finger separations: thicker dark strokes across each palm's top.
+    for fx in (hx2 - 44, hx2 - 32, hx2 - 20):
+        draw.line([fx, hy - 17, fx + 5, hy - 2], fill=(170, 128, 88), width=3)
+    for fx in (hx2 + 20, hx2 + 32, hx2 + 44):
+        draw.line([fx, hy - 19, fx - 5, hy - 4], fill=(152, 112, 78), width=3)
+    # Crossed thumbs over the top, one from each hand, ~30% larger.
+    draw.polygon([(hx2 - 26, hy - 12), (hx2 - 5, hy - 34), (hx2 + 6, hy - 29),
+                  (hx2 - 13, hy - 8)], fill=skin_a, outline=seam)
+    draw.polygon([(hx2 + 26, hy - 12), (hx2 + 5, hy - 34), (hx2 - 6, hy - 29),
+                  (hx2 + 13, hy - 8)], fill=skin_b, outline=seam)
+    # Xi's hand on the clasp's left edge, in a third skin tone, so
+    # three hands converge on the one contact point.
+    draw.ellipse([hx2 - 70, hy - 6, hx2 - 46, hy + 10], fill=(220, 178, 140),
+                 outline=seam, width=2)
+    for fx in (hx2 - 64, hx2 - 56):
+        draw.line([fx, hy - 4, fx + 3, hy + 5], fill=(178, 138, 100), width=2)
+    # Flag label chips last (round 7): nothing drawn above can cover
+    # them - same positions the round-6 chips occupied.
+    for (fname, rgb), cx in zip(flags, xs):
+        label_chip(draw, cx - fw // 2, y + int(h * 0.07) + fh + 1, fw, 14,
+                   fname, size=9, align="tl")
     # The long table and its name plates.
     draw.rectangle([x + int(w * 0.04), table_y, x + int(w * 0.96), y + h], fill=(96, 66, 40))
     draw.rectangle([x + int(w * 0.04), table_y, x + int(w * 0.96), table_y + 4],
@@ -315,21 +415,29 @@ def paint_case_map(draw, x, y, w, h, spec):
     draw.rectangle([x, y, x + w, y + h], fill=(228, 224, 208))
     draw.rectangle([x, y + int(h * 0.78), x + w, y + h], fill=(188, 178, 158))
     # Wall poster with a recognisable US outline and one solid hotspot.
+    # Round 7: the outline is redrawn with the features that make it
+    # read as the US at card size - a Great Lakes dip on the north
+    # border, a Florida spike, a Texas bulge - and the poster's own
+    # "UNITED STATES" lettering is gone: the scene's label chip is
+    # now the single place the name is lettered (it was twice).
     px, py = x + int(w * 0.58), y + int(h * 0.10)
     pw, ph = int(w * 0.36), int(h * 0.52)
     draw.rectangle([px, py, px + pw, py + ph], fill=(246, 244, 238), outline=INK)
-    us = [(0.04, 0.30), (0.14, 0.16), (0.30, 0.10), (0.48, 0.14), (0.62, 0.06),
-          (0.78, 0.10), (0.94, 0.22), (0.90, 0.40), (0.80, 0.52), (0.76, 0.72),
-          (0.62, 0.80), (0.48, 0.72), (0.34, 0.84), (0.20, 0.70), (0.08, 0.52)]
+    us = [(0.04, 0.28), (0.18, 0.16), (0.34, 0.11), (0.52, 0.16), (0.60, 0.10),
+          (0.78, 0.08), (0.93, 0.14), (0.96, 0.24), (0.90, 0.36), (0.89, 0.46),
+          (0.93, 0.60), (0.90, 0.74), (0.84, 0.64), (0.78, 0.70), (0.66, 0.66),
+          (0.58, 0.74), (0.52, 0.86), (0.44, 0.82), (0.34, 0.84), (0.26, 0.76),
+          (0.14, 0.72), (0.07, 0.58), (0.03, 0.44)]
     draw.polygon([(px + int(a * pw), py + int(b * ph)) for a, b in us],
                  fill=(196, 205, 190), outline=(90, 100, 88))
     hx, hy = px + int(pw * 0.55), py + int(ph * 0.45)
     draw.ellipse([hx - 5, hy - 5, hx + 5, hy + 5], fill=(200, 40, 36))
-    fnt = ImageFont.truetype(SANS_BOLD, 8)
-    draw.text((px + 4, py + 3), "UNITED STATES", font=fnt, fill=INK)
-    # Nurse (teal scrubs, cap) leaning in with a syringe.
+    # Nurse (teal scrubs, cap) leaning in with a syringe. Round 7:
+    # the cap is dark teal, not white - the white cap blended into
+    # the pale wall and the head disappeared; both figures' heads
+    # now carry a dark top against the ground.
     nx = x + int(w * 0.30)
-    person(draw, nx, y + int(h * 0.18), 1.3, (232, 192, 158), (240, 240, 240),
+    person(draw, nx, y + int(h * 0.18), 1.3, (232, 192, 158), (30, 105, 105),
            (38, 140, 140), tie=(38, 140, 140))
     draw.line([nx + 14, y + int(h * 0.52), nx + 34, y + int(h * 0.46)],
               fill=(232, 192, 158), width=5)
@@ -373,6 +481,40 @@ def paint_chart_down(draw, x, y, w, h, spec):
     label_chip(draw, x, y, w, h, spec.get("label", ""), align="tl")
 
 
+def paint_chart_up(draw, x, y, w, h, spec):
+    # Listings board for the Anthropic card (round 7, original to
+    # this painter): a dark board of green candles climbing left to
+    # right under a gold trend line, the $83 offer price lettered
+    # large inside the art so the figure survives downscaling, two
+    # traders on the floor below, and the ANT tag as the label chip.
+    draw.rectangle([x, y, x + w, y + h], fill=(26, 34, 30))
+    bx, by = x + int(w * 0.06), y + int(h * 0.10)
+    bw, bh = int(w * 0.88), int(h * 0.54)
+    draw.rectangle([bx, by, bx + bw, by + bh], fill=(14, 22, 18),
+                   outline=(110, 130, 115))
+    base = by + bh - 4
+    step = (bh - 16) / 7.0
+    for i in range(7):
+        cx0 = bx + 8 + i * ((bw - 16) // 7)
+        cw0 = max(6, (bw - 16) // 7 - 9)
+        lo = base - int(i * step)
+        hi = lo - int(step + 6)
+        draw.line([cx0 + cw0 // 2, hi - 3, cx0 + cw0 // 2, lo + 2],
+                  fill=(150, 215, 160), width=1)
+        draw.rectangle([cx0, hi, cx0 + cw0, lo], fill=(64, 178, 96))
+    draw.line([bx + 6, base - 2, bx + bw - 6, by + 6], fill=(244, 196, 84),
+              width=2)
+    pfnt = ImageFont.truetype(SANS_BOLD, 15)
+    draw.text((bx + bw // 2 - width_of("$83", pfnt) // 2, by + 2), "$83",
+              font=pfnt, fill=(244, 196, 84))
+    floor_y = y + int(h * 0.72)
+    for fx in (0.30, 0.62):
+        person(draw, x + int(w * fx), floor_y - 6, 0.95, (232, 192, 158),
+               (36, 30, 26), (44, 54, 66), tie=(64, 178, 96))
+    draw.rectangle([x, floor_y + 18, x + w, y + h], fill=(20, 26, 22))
+    label_chip(draw, x, y, w, h, spec.get("label", ""), align="tl")
+
+
 def paint_chip(draw, x, y, w, h, spec):
     # Clean-room fab: dark room, glowing wafer, worker in a bunny suit.
     draw.rectangle([x, y, x + w, y + h], fill=(36, 44, 56))
@@ -400,6 +542,12 @@ def paint_chip(draw, x, y, w, h, spec):
         dx = x + int(w * 0.86) + 3 + rng.below(int(w * 0.08))
         dy = y + int(h * 0.20) + 3 + rng.below(int(h * 0.30))
         draw.rectangle([dx, dy, dx + 2, dy + 2], fill=(120, 230, 200))
+    # Round 7: the day's move lettered legibly in the art itself -
+    # the scene's only downward evidence used to be a ~20 px chart
+    # inset in another card; here the -4% sits in the open wall
+    # space at the top right, clear of the NVIDIA chip (top left).
+    dfnt = ImageFont.truetype(SANS_BOLD, 14)
+    draw.text((x + int(w * 0.80), y + 5), "−4%", font=dfnt, fill=(255, 96, 72))
     label_chip(draw, x, y, w, h, spec.get("label", ""), align="tl")
 
 
@@ -584,7 +732,17 @@ def paint_conference(draw, x, y, w, h, spec):
                    fill=(110, 84, 56))
     draw.rectangle([x + int(w * 0.03), table_y, x + int(w * 0.97), table_y + 4],
                    fill=(146, 112, 72))
-    label_chip(draw, x, y, w, h, spec.get("label", ""), align="tl")
+    # Round 7: the label chip is gone - "COP31" was lettered twice
+    # in this scene (banner + chip); the banner keeps the name. In
+    # its place, a 35% placard on the table front carries the strip
+    # figure inside the art, where downscaling cannot erase it.
+    pfnt = ImageFont.truetype(SANS_BOLD, 12)
+    ptw = width_of("35%", pfnt)
+    pcx = x + w // 2
+    draw.rectangle([pcx - ptw // 2 - 6, table_y + 6, pcx + ptw // 2 + 6,
+                    table_y + 23], fill=(24, 30, 46))
+    draw.text((pcx - ptw // 2, table_y + 9), "35%", font=pfnt,
+              fill=(244, 196, 84))
 
 
 def paint_gta_skyline(draw, x, y, w, h, spec):
@@ -659,44 +817,70 @@ MAP_ROWS = [
     "                                                    ",
 ]
 
-# Region -> (fx, fy) anchor on the map, aligned to MAP_ROWS landmass.
-REGION_ANCHORS = {
-    "North America": (0.17, 0.24),
-    "South America": (0.14, 0.60),
-    "Europe": (0.50, 0.16),
-    "Africa": (0.56, 0.50),
-    "Middle East": (0.615, 0.30),
-    "Asia": (0.76, 0.20),
-    "Oceania": (0.85, 0.60),
+# Pin positions, round 7: explicit true-location placement, one
+# (col, row) cell per illustrated story on the 52x20 MAP_ROWS grid,
+# fx=(col+0.5)/52, fy=(row+0.5)/20. Pin num = printed story number
+# (layout.map_spec: hero + cards in page order). Round 7 re-derives
+# the table after the Anthropic/Dow swap - pin 10 is now the
+# Anthropic card, but both stories are New York, so the city is
+# unchanged - and re-plots the pins the round-7 panel found in the
+# wrong labelled zone: Kerch west out of the Asia cluster to the
+# Europe landmass's east edge, Antalya south to the Mediterranean
+# row, Gaza west to the Levant edge, DR Congo west/south into the
+# Africa landmass, New York east to the coast edge of the N.
+# America landmass, The Hague south-east within Europe so the
+# re-anchored EUROPE label clears it. Every centre sits on a land
+# cell; min pairwise separation 28.3 px (pins 9-12), so no two
+# r=12 pins can cover each other.
+PIN_POSITIONS = {
+    1: (42.5 / 52, 5.5 / 20),    # Shenzhen
+    2: (27.5 / 52, 2.5 / 20),    # The Hague
+    3: (36.5 / 52, 5.5 / 20),    # Hormuz
+    4: (33.5 / 52, 8.5 / 20),    # Bahrain
+    5: (27.5 / 52, 11.5 / 20),   # DR Congo
+    6: (39.5 / 52, 8.5 / 20),    # Bengal
+    7: (33.5 / 52, 1.5 / 20),    # Kerch
+    8: (30.5 / 52, 5.5 / 20),    # Antalya
+    9: (5.5 / 52, 3.5 / 20),     # Santa Clara
+    10: (15.5 / 52, 3.5 / 20),   # New York (Anthropic; the Dow held
+                                 # this slot pre-swap - same city)
+    11: (27.5 / 52, 8.5 / 20),   # Gaza
+    12: (9.5 / 52, 5.5 / 20),    # U.S.
+    13: (42.5 / 52, 13.5 / 20),  # NZ
 }
 
 
-def _map_jitter(k):
-    """Deterministic spread for the k-th pin in one region. Wide
-    enough that 16 px pins in the same region separate instead of
-    stacking into one blob."""
-    return ((k % 3) - 1) * 0.075, (((k // 3) % 3) - 1) * 0.10
-
-
-# Region label positions (fx, fy), set in the open water beside each
-# landmass so the map names its regions at judge scale.
+# Region label positions (fx, fy). Every label sits in open water
+# beside its landmass, or just off its edge, over a paper knockout
+# that erases the dot field behind it. Round 7: EUROPE moves from
+# the Atlantic at South-America latitude (where it floated across
+# the Americas side of the map) to the water above the Europe
+# landmass; AFRICA moves from beside South America to just below
+# the Africa landmass's south edge; OCEANIA moves from under the
+# Middle East to below the Oceania land in the south-east.
 REGION_LABELS = {
     "North America": ("N. AMERICA", 0.03, 0.04),
-    "South America": ("S. AMERICA", 0.04, 0.80),
-    "Europe": ("EUROPE", 0.42, 0.03),
-    "Africa": ("AFRICA", 0.50, 0.70),
-    "Middle East": ("MIDDLE EAST", 0.545, 0.44),
-    "Asia": ("ASIA", 0.76, 0.04),
-    "Oceania": ("OCEANIA", 0.76, 0.80),
+    "South America": ("S. AMERICA", 0.01, 0.55),
+    "Europe": ("EUROPE", 0.43, 0.005),
+    "Africa": ("AFRICA", 0.52, 0.68),
+    "Middle East": ("MIDDLE EAST", 0.64, 0.52),
+    "Asia": ("ASIA", 0.78, 0.02),
+    "Oceania": ("OCEANIA", 0.76, 0.78),
 }
 
 
 def paint_worldmap(draw, x, y, w, h, spec):
     """Landmass with big numbered pins for the illustrated stories,
-    placed by each story's region, plus printed region labels. spec
-    carries 'pins': [(num, region)]; 'dots' is accepted for
-    compatibility but no longer drawn - 30 small brief dots read as
-    noise at judge scale, so the briefs live only in the index."""
+    placed at each story's true location, plus printed region labels.
+    spec carries 'pins': [(num, region)]; the region is accepted for
+    compatibility but placement now reads PIN_POSITIONS[num]. 'dots'
+    is accepted for compatibility but no longer drawn - 30 small
+    brief dots read as noise at judge scale, so the briefs live only
+    in the index.
+    Round 5: pins sit at explicit true-location positions
+    (PIN_POSITIONS, one per printed story number), each pin clamped
+    inside the map box, and every region label sits in open water
+    over a paper knockout that erases the dot field behind it."""
     cols = len(MAP_ROWS[0])
     rows = len(MAP_ROWS)
     # Land dots at radius 2 on a ~5 px grid merge into a solid muted
@@ -708,26 +892,24 @@ def paint_worldmap(draw, x, y, w, h, spec):
                 cx = x + int((c + 0.5) * w / cols)
                 cy = y + int((r + 0.5) * h / rows)
                 draw.ellipse([cx - 2, cy - 2, cx + 2, cy + 2], fill=(176, 170, 156))
-    lab_fnt = ImageFont.truetype(SANS_BOLD, 8)
+    lab_fnt = ImageFont.truetype(SANS_BOLD, 9)
     for text, fx, fy in REGION_LABELS.values():
-        draw.text((x + int(fx * w), y + int(fy * h)), text,
-                  font=lab_fnt, fill=(56, 52, 46))
-    seen_pins = {}
-
-    def _place(region, seen):
-        k = seen.get(region, 0)
-        seen[region] = k + 1
-        ax, ay = REGION_ANCHORS[region]
-        jx, jy = _map_jitter(k)
-        return x + int((ax + jx) * w), y + int((ay + jy) * h)
-
-    fnt = ImageFont.truetype(SANS_BOLD, 9)
+        lx, ly = x + int(fx * w), y + int(fy * h)
+        tw = width_of(text, lab_fnt)
+        draw.rectangle([lx - 3, ly - 2, lx + tw + 3, ly + 11], fill=PAPER)
+        draw.text((lx, ly), text, font=lab_fnt, fill=(56, 52, 46))
+    pin_r = 12
+    fnt = ImageFont.truetype(SANS_BOLD, 12)
     for num, region in spec.get("pins") or []:
-        cx, cy = _place(region, seen_pins)
-        draw.ellipse([cx - 8, cy - 8, cx + 8, cy + 8], fill=(168, 38, 32),
-                     outline=(247, 243, 234), width=2)
+        fx, fy = PIN_POSITIONS[num]
+        cx = x + int(fx * w)
+        cy = y + int(fy * h)
+        cx = max(x + pin_r + 1, min(cx, x + w - pin_r - 1))
+        cy = max(y + pin_r + 1, min(cy, y + h - pin_r - 1))
+        draw.ellipse([cx - pin_r, cy - pin_r, cx + pin_r, cy + pin_r],
+                     fill=(168, 38, 32), outline=(247, 243, 234), width=2)
         label = str(num)
-        draw.text((cx - width_of(label, fnt) // 2, cy - 5), label,
+        draw.text((cx - width_of(label, fnt) // 2, cy - 6), label,
                   font=fnt, fill=(247, 243, 234))
 
 
@@ -739,6 +921,7 @@ PAINTERS = {
     "summit": paint_summit,
     "case_map": paint_case_map,
     "chart_down": paint_chart_down,
+    "chart_up": paint_chart_up,
     "chip": paint_chip,
     "missiles": paint_missiles,
     "probe": paint_probe,

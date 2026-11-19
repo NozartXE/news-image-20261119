@@ -7,7 +7,7 @@
    "place": "SHENZHEN",
    "region": "Asia",
    "tier": "hero",
-   "headline": "Trump, Xi and Putin meet in Shenzhen in first-ever trilateral",
+   "headline": "Xi, Trump and Putin meet in Shenzhen in first-ever trilateral",
    "dek": "Xi, Trump and Putin open the first three-way summit talks on Thursday in Shenzhen; a Wednesday handshake set the stage.",
    "scene": "summit",
    "scene_caption": "THREE LEADERS, ONE TABLE IN SHENZHEN",
@@ -45,16 +45,16 @@
    "num": 1
   },
   {
-   "id": 2,
-   "place": "KERCH, CRIMEA",
+   "id": 7,
+   "place": "THE HAGUE",
    "region": "Europe",
    "tier": "card",
-   "headline": "Kerch Bridge hit a third time in a week",
-   "dek": "A span fell Tuesday; traffic halts for a 3rd time in 7 days as crews assess damage. — Reuters",
-   "scene": "bridge_fallen",
-   "scene_caption": "KERCH BRIDGE HIT AGAIN",
+   "headline": "World Court to rule today on Myanmar genocide case",
+   "dek": "Gambia sued in 2019 over the campaign driving 700,000+ Rohingya out in 2017; judges read the ruling today. — AP",
+   "scene": "scales",
+   "scene_caption": "MYANMAR GENOCIDE RULING TODAY",
    "sources": [
-    "Reuters"
+    "AP"
    ],
    "num": 2
   },
@@ -99,7 +99,7 @@
     "label": "DR CONGO"
    },
    "strip_figure": "11,536",
-   "strip_caption": "EBOLA CASES IN DR CONGO",
+   "strip_caption": "EBOLA CASES IN CONGO",
    "sources": [
     "WHO"
    ],
@@ -111,7 +111,7 @@
    "region": "Asia",
    "tier": "card",
    "headline": "Cyclone Akvan turns very severe off India's coast",
-   "dek": "Winds gust to 130 km/h with rain over 21 cm; landfall is due Friday on the Andhra coast. — IMD",
+   "dek": "Winds gust to 130 km/h with rain over 21 cm; 200,000 evacuated ahead of Friday's Andhra coast landfall. — IMD",
    "scene": "cyclone",
    "scene_caption": "AKVAN HEADS FOR ANDHRA",
    "scene_spec": {
@@ -121,20 +121,20 @@
     "IMD"
    ],
    "strip_figure": "130 km/h",
-   "strip_caption": "AKVAN'S PEAK WIND GUSTS",
+   "strip_caption": "AKVAN'S WIND GUSTS",
    "num": 6
   },
   {
-   "id": 7,
-   "place": "THE HAGUE",
+   "id": 2,
+   "place": "KERCH, CRIMEA",
    "region": "Europe",
    "tier": "card",
-   "headline": "World Court to rule today on Myanmar genocide case",
-   "dek": "Gambia sued in 2019 over the 2017 Rohingya campaign; judges read the ruling today. — AP",
-   "scene": "scales",
-   "scene_caption": "MYANMAR GENOCIDE RULING TODAY",
+   "headline": "Kerch Bridge hit a third time in a week",
+   "dek": "A span fell Wednesday (18 Nov); traffic halts for a 3rd time in 7 days as crews assess damage. — Reuters",
+   "scene": "bridge_fallen",
+   "scene_caption": "KERCH BRIDGE HIT AGAIN",
    "sources": [
-    "AP"
+    "Reuters"
    ],
    "num": 7
   },
@@ -146,7 +146,7 @@
    "headline": "COP31 draft splits ministers as talks near the end",
    "dek": "Ministers split as OPEC defends fossil fuels; a 35% power target for 2035 is backed. — Reuters",
    "strip_figure": "35%",
-   "strip_caption": "COP31 2035 POWER TARGET",
+   "strip_caption": "COP31 POWER TARGET",
    "scene": "conference",
    "scene_caption": "COP31 TALKS NEAR THE END",
    "scene_spec": {
@@ -162,10 +162,10 @@
    "place": "SANTA CLARA",
    "region": "North America",
    "tier": "card",
-   "headline": "Nvidia posts record quarter; ends China chip sales",
-   "dek": "Revenue roughly doubles year on year as Kress halts H200 chip shipments to China. — Bloomberg",
+   "headline": "Nvidia slides after ending China chip sales",
+   "dek": "Shares slide 4% as Nvidia halts H200 chip shipments to China. — Bloomberg",
    "scene": "chip",
-   "scene_caption": "RECORD QUARTER, CHINA SALES END",
+   "scene_caption": "SHARES SLIDE, CHINA SALES END",
    "scene_spec": {
     "label": "NVIDIA"
    },
@@ -175,18 +175,21 @@
    "num": 9
   },
   {
-   "id": 10,
+   "id": 27,
    "place": "NEW YORK",
    "region": "North America",
    "tier": "card",
-   "headline": "Dow slides as Fed minutes point to more rate hikes",
-   "dek": "UnitedHealth sinks 10% on a Medicare audit plan; the index falls a 5th straight day. — Reuters",
-   "scene": "chart_down",
-   "scene_caption": "WALL STREET SLIDES ON FED MINUTES",
+   "headline": "Anthropic debuts in the biggest IPO on record",
+   "dek": "Priced at $83, above its range, the Claude maker raised $81.3bn and is valued near $1.5tn. — Reuters",
+   "scene": "chart_up",
+   "scene_caption": "ANTHROPIC LISTS AT $83 A SHARE",
    "scene_spec": {
-    "label": "DOW"
+    "label": "ANT"
    },
+   "strip_figure": "$81.3bn",
+   "strip_caption": "LARGEST IPO EVER",
    "sources": [
+    "Bloomberg",
     "Reuters"
    ],
    "num": 10
@@ -201,7 +204,7 @@
    "scene": "tents",
    "scene_caption": "FOURTH WINTER UNDER CANVAS",
    "strip_figure": "150,000",
-   "strip_caption": "TENTS BLOCKED AT BORDER",
+   "strip_caption": "TENTS BLOCKED, GAZA",
    "sources": [
     "AP"
    ],
@@ -219,8 +222,6 @@
    "scene_spec": {
     "label": "UNITED STATES"
    },
-   "strip_figure": "5,412",
-   "strip_caption": "U.S. MEASLES CASES IN 2026",
    "sources": [
     "AP",
     "PAHO"
@@ -244,7 +245,7 @@
     "Metacritic"
    ],
    "strip_figure": "99",
-   "strip_caption": "GTA VI METACRITIC SCORE",
+   "strip_caption": "GTA VI SCORE",
    "num": 13
   },
   {
@@ -275,12 +276,12 @@
   },
   {
    "id": 17,
-   "place": "BRUSSELS",
+   "place": "FRANKFURT",
    "region": "Europe",
    "tier": "index",
-   "headline": "EU offers Ukraine a €45bn loan tied to reparations",
-   "dek": "Kyiv repays only after Russian reparations; leaders discuss it next week.",
-   "brief": "BRUSSELS — EU offers a €45bn Ukraine loan.",
+   "headline": "Deutsche Bank handled $582m in Epstein-linked deals",
+   "dek": "Deutsche Bank handled $582m in Epstein-linked deals.",
+   "brief": "FRANKFURT — Deutsche Bank did $582m Epstein deals.",
    "sources": [
     "Reuters"
    ],
@@ -356,12 +357,12 @@
    "place": "WASHINGTON",
    "region": "North America",
    "tier": "index",
-   "headline": "Pew: Muslims to top Christians by 2035",
-   "dek": "Pew projects Islam passes Christianity as the world's largest religion by 2035, on faster birth rates.",
-   "brief": "WASHINGTON — Pew projects a Muslim lead by 2035.",
+   "headline": "U.S. details $12bn of Venezuelan oil revenue",
+   "dek": "U.S. details $12bn of Venezuelan oil revenue.",
+   "brief": "WASHINGTON — U.S. details $12bn in Venezuela oil.",
    "sources": [
-    "Pew Research Center",
-    "Reuters"
+    "Reuters",
+    "AP"
    ],
    "num": 22
   },
@@ -393,15 +394,14 @@
    "num": 24
   },
   {
-   "id": 27,
+   "id": 10,
    "place": "NEW YORK",
    "region": "North America",
    "tier": "index",
-   "headline": "Anthropic prices its IPO at $83 a share",
-   "dek": "The AI firm raises about $81bn; shares start trading Thursday as ANT.",
-   "brief": "NEW YORK — Anthropic prices its IPO at $83.",
+   "headline": "Dow slides as Fed minutes point to more rate hikes",
+   "dek": "UnitedHealth sinks 10% on a Medicare audit plan; the index falls a 5th straight day. — Reuters",
+   "brief": "NEW YORK — Dow slides as Fed points to hikes.",
    "sources": [
-    "Bloomberg",
     "Reuters"
    ],
    "num": 25
@@ -617,14 +617,14 @@
   },
   {
    "id": 8,
-   "place": "PASADENA",
+   "place": "SACRAMENTO",
    "region": "North America",
    "tier": "index",
-   "headline": "Voyager 1 reaches one light-day from Earth",
-   "dek": "NASA's 1977 probe crosses a threshold no spacecraft has crossed; its signal now takes a full day to arrive.",
-   "brief": "PASADENA — Voyager 1 reaches one light-day.",
+   "headline": "California braces for an atmospheric river",
+   "dek": "California braces for an atmospheric river; flood advisories out.",
+   "brief": "SACRAMENTO — Calif. braces for atmospheric river.",
    "sources": [
-    "NASA"
+    "AP"
    ],
    "num": 42
   },
